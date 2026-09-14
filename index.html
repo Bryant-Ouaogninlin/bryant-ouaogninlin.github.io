@@ -236,7 +236,7 @@
   }
 
   /* ---------- PROJECTS ---------- */
-  .project-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,380px));gap:22px;justify-content:center;}
   @media (max-width:980px){ .project-grid{grid-template-columns:1fr;} }
   .project-card{
     background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;
@@ -271,6 +271,12 @@
   .detail-list li::before{content:"›";color:var(--accent-2);flex:none;font-weight:700;}
   .detail-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
   .detail-meta span{font-family:var(--font-mono);font-size:.74rem;color:var(--text-muted);background:var(--bg-elevated);border:1px solid var(--border);border-radius:20px;padding:6px 12px;}
+  .detail-figure{margin:22px 0 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-elevated);}
+  .detail-figure img{width:100%;display:block;}
+  .detail-figure figcaption{padding:10px 14px;font-family:var(--font-mono);font-size:.74rem;color:var(--text-muted);border-top:1px solid var(--border-soft);}
+  .detail-figures-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;}
+  @media (max-width:640px){ .detail-figures-2{grid-template-columns:1fr;} }
+  .detail-figures-2 .detail-figure{margin-top:0;}
   .project-tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);}
   .project-body h3{font-size:1.08rem;font-weight:700;}
   .project-body p{color:var(--text-muted);font-size:.92rem;}
@@ -570,58 +576,6 @@
             <p class="project-more">Voir le détail <span aria-hidden="true">→</span></p>
           </div>
         </a>
-
-        <a class="project-card reveal" href="#projet-etudiants">
-          <div class="project-visual">
-            <svg viewBox="0 0 100 100" fill="none">
-              <ellipse cx="50" cy="26" rx="26" ry="9" fill="#171d33" stroke="#45d6c0" stroke-width="1.6"/>
-              <path d="M24 26v20c0 5 11.6 9 26 9s26-4 26-9V26" stroke="#45d6c0" stroke-width="1.6"/>
-              <path d="M24 46v20c0 5 11.6 9 26 9s26-4 26-9V46" stroke="#7c6cf0" stroke-width="1.6"/>
-              <line x1="24" y1="46" x2="76" y2="46" stroke="#3a4266" stroke-width="1.2"/>
-            </svg>
-          </div>
-          <div class="project-body">
-            <p class="project-tag">Projet base de données</p>
-            <h3>Gestion des étudiants</h3>
-            <p>Système de gestion des étudiants adossé à une base de données relationnelle dédiée (<em>gestion_etudiant</em>).</p>
-            <ul class="project-list">
-              <li>Modélisation relationnelle : élèves, classes, notes</li>
-              <li>Requêtes SQL (MySQL / Oracle SQL) pour inscriptions et suivis</li>
-              <li>Interface de gestion des résultats</li>
-            </ul>
-            <p class="project-more">Voir le détail <span aria-hidden="true">→</span></p>
-          </div>
-        </a>
-
-        <a class="project-card reveal" href="#projet-optimel">
-          <div class="project-visual">
-            <svg viewBox="0 0 100 100" fill="none">
-              <rect x="34" y="34" width="32" height="32" rx="5" fill="#171d33" stroke="#f0a35e" stroke-width="1.6"/>
-              <circle cx="50" cy="50" r="6" fill="none" stroke="#f0a35e" stroke-width="1.6"/>
-              <g stroke="#3a4266" stroke-width="1.6">
-                <line x1="50" y1="34" x2="50" y2="18"/>
-                <line x1="50" y1="66" x2="50" y2="82"/>
-                <line x1="34" y1="50" x2="18" y2="50"/>
-                <line x1="66" y1="50" x2="82" y2="50"/>
-              </g>
-              <circle cx="50" cy="18" r="3" fill="#7c6cf0"/>
-              <circle cx="50" cy="82" r="3" fill="#7c6cf0"/>
-              <circle cx="18" cy="50" r="3" fill="#7c6cf0"/>
-              <circle cx="82" cy="50" r="3" fill="#7c6cf0"/>
-            </svg>
-          </div>
-          <div class="project-body">
-            <p class="project-tag">Projet ingénierie électrique</p>
-            <h3>OPTIMEL IA</h3>
-            <p>Projet pluridisciplinaire d'ingénierie électrique et d'automatisation intelligente pour l'optimisation de dispositifs connectés.</p>
-            <ul class="project-list">
-              <li>Automatisation intelligente de dispositifs électriques</li>
-              <li>Approche croisée électronique et logicielle</li>
-              <li>Travail en équipe sur un cas concret d'optimisation</li>
-            </ul>
-            <p class="project-more">Voir le détail <span aria-hidden="true">→</span></p>
-          </div>
-        </a>
       </div>
     </div>
   </section>
@@ -673,14 +627,123 @@
         </div>
 
         <div class="detail-block">
-          <h2>Réalisations techniques</h2>
+          <h2>Architecture réseau &amp; VLAN</h2>
           <ul class="detail-list">
             <li>Architecture réseau à deux niveaux (cœur/accès) avec routage inter-VLAN en « router-on-a-stick » : 6 VLAN (Direction, Commercial, Comptabilité, Technique, Serveurs, Administration), chacun sur son sous-réseau /24</li>
-            <li>Service DHCP centralisé sur Windows Server, une étendue par VLAN, relayée via des commandes <code>ip helper-address</code> sur le routeur</li>
-            <li>Contrôleur de domaine Active Directory (<em>entreprise.local</em>) : unités d'organisation par service, groupes de sécurité, comptes nominatifs</li>
-            <li>Partage de fichiers centralisé avec permissions NTFS par groupe (lecture seule / modification selon le service)</li>
-            <li>Sauvegarde planifiée quotidienne (Windows Server Backup), rétention de 14 jours, validée par une exécution manuelle</li>
+            <li>Encapsulation 802.1Q sur les sous-interfaces du routeur, une sous-interface par VLAN</li>
           </ul>
+
+          <figure class="detail-figure">
+            <img src="assets/topology.jpg" alt="Topologie réseau NextTech Solutions sous Cisco Packet Tracer : routeur central, 4 VLAN par service et serveur." loading="lazy">
+            <figcaption>Schéma réseau complet réalisé sous Cisco Packet Tracer — routage inter-VLAN en « router-on-a-stick ».</figcaption>
+          </figure>
+          <figure class="detail-figure">
+            <img src="assets/subif.jpg" alt="Terminal Cisco IOS affichant la configuration des sous-interfaces GigabitEthernet et des commandes ip helper-address du routeur." loading="lazy">
+            <figcaption>Routeur — sous-interfaces 802.1Q et commandes ip helper-address par VLAN</figcaption>
+          </figure>
+        </div>
+
+        <div class="detail-block">
+          <h2>Adressage IP &amp; DHCP</h2>
+          <p>Chaque VLAN dispose de sa propre étendue DHCP sur le serveur Windows, avec une plage d'adresses dédiée, un masque en /24 et une passerelle propagée automatiquement aux postes clients. Le routeur relaie les requêtes vers le serveur central via des commandes <code>ip helper-address</code> configurées sur chaque sous-interface.</p>
+          <figure class="detail-figure">
+            <img src="assets/dhcp.jpg" alt="Assistant nouvelle étendue DHCP sur Windows Server : plage d'adresses 192.168.10.1 à 192.168.10.200 pour le VLAN Direction." loading="lazy">
+            <figcaption>Assistant DHCP — étendue VLAN_DIRECTION (192.168.10.0/24)</figcaption>
+          </figure>
+        </div>
+
+        <div class="detail-block">
+          <h2>Tests de connectivité</h2>
+          <p>Une fois le réseau configuré, une série de tests a validé l'attribution DHCP, le routage intra-VLAN, inter-VLAN et l'accès au serveur depuis chaque VLAN — sans perte de paquet.</p>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/ipconfig.jpg" alt="Commande ipconfig /all sur un poste du VLAN Direction confirmant l'adresse IP, la passerelle et le serveur DNS attribués par DHCP." loading="lazy">
+              <figcaption>ipconfig /all — attribution DHCP sur un poste du VLAN 10</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/pingvlan.jpg" alt="Ping réussi entre deux postes du même VLAN 20, 0% de perte de paquet." loading="lazy">
+              <figcaption>Ping intra-VLAN réussi (VLAN 20), 0% de perte</figcaption>
+            </figure>
+          </div>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/pingintervlan.jpg" alt="Ping réussi entre un poste du VLAN 10 et un poste du VLAN 40, validant le routage inter-VLAN." loading="lazy">
+              <figcaption>Ping inter-VLAN réussi — VLAN 10 vers VLAN 40</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/pingserver.jpg" alt="Ping réussi depuis un poste client vers l'adresse du serveur 192.168.99.10." loading="lazy">
+              <figcaption>Ping réussi vers le serveur (192.168.99.10) depuis un poste client</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Installation &amp; promotion du serveur</h2>
+          <p>Le serveur central repose sur Windows Server (édition Standard, Bureau d'expérience), déployé dans une VM dédiée puis configuré en IP statique avant l'ajout du rôle AD DS et la promotion en contrôleur de domaine.</p>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/vmspecs.jpg" alt="Paramètres de la machine virtuelle du serveur : 4 Go de RAM, 4 processeurs, 20 Go de disque." loading="lazy">
+              <figcaption>Machine virtuelle du serveur — 4 Go RAM, 4 vCPU, 20 Go disque</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/staticip.jpg" alt="Configuration de l'adresse IP statique 192.168.99.10/24 du serveur." loading="lazy">
+              <figcaption>Configuration IP statique du serveur (192.168.99.10/24)</figcaption>
+            </figure>
+          </div>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/addsrole.jpg" alt="Assistant d'ajout de rôles : sélection des services AD DS, DHCP et DNS." loading="lazy">
+              <figcaption>Ajout des rôles AD DS, DHCP et DNS</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/adpromo.jpg" alt="Gestionnaire de serveur confirmant la promotion réussie du serveur en contrôleur de domaine, avec les rôles AD DS et DHCP installés." loading="lazy">
+              <figcaption>Promotion du serveur en contrôleur de domaine</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Déploiement Active Directory</h2>
+          <p>Le serveur a été promu contrôleur de domaine (<em>entreprise.local</em>) via le rôle AD DS, puis une arborescence d'unités d'organisation et de groupes de sécurité globaux a été créée pour refléter l'organigramme de l'entreprise, selon la convention « GG_&lt;service&gt;_RW/RO ».</p>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/dnsmgr.jpg" alt="Gestionnaire DNS du contrôleur de domaine listant les enregistrements hôtes des passerelles de chaque VLAN." loading="lazy">
+              <figcaption>Gestionnaire DNS — zone entreprise.local et enregistrements par VLAN</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/outree.jpg" alt="Arborescence des unités d'organisation dans Active Directory : NextTech, Direction, Commercial, Comptabilité, Technique." loading="lazy">
+              <figcaption>Arborescence des unités d'organisation (OU) sous entreprise.local</figcaption>
+            </figure>
+          </div>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/group.jpg" alt="Création du groupe de sécurité global GG_COMMERCIAL_RW dans l'unité d'organisation Commercial." loading="lazy">
+              <figcaption>Création d'un groupe de sécurité — GG_COMMERCIAL_RW</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/usercreate.jpg" alt="Création d'un compte utilisateur nominatif (yao.brou) dans l'unité d'organisation Direction." loading="lazy">
+              <figcaption>Création d'un compte utilisateur nominatif — yao.brou</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Partage de fichiers &amp; permissions NTFS</h2>
+          <p>Une arborescence de dossiers partagés (Direction, Commercial, Comptabilité, Technique, Commun) a été créée sur le serveur, avec un partage réseau SMB par dossier. Les permissions NTFS reposent exclusivement sur les groupes de sécurité (principe AGDLP) : modification pour le groupe du service concerné, lecture seule pour le groupe commun.</p>
+          <figure class="detail-figure">
+            <img src="assets/sharetree.jpg" alt="Explorateur de fichiers listant l'arborescence des dossiers partagés Direction, Commercial, Comptabilité, Technique, Commun." loading="lazy">
+            <figcaption>Arborescence des dossiers partagés sur le serveur (D:\Partages)</figcaption>
+          </figure>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/share.jpg" alt="Configuration des autorisations de partage réseau du dossier Direction, accès Contrôle total / Modifier / Lecture." loading="lazy">
+              <figcaption>Autorisations de partage réseau — dossier Direction</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/ntfs.jpg" alt="Paramètres de sécurité NTFS avancés du dossier Direction listant les entrées d'autorisation par groupe." loading="lazy">
+              <figcaption>Permissions NTFS avancées — GG_DIRECTION_RW en Modification</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="detail-block">
@@ -691,6 +754,46 @@
             <li>Durcissement : désactivation de SMBv1, règle de pare-feu restreignant le RDP au seul VLAN d'administration</li>
             <li>GPO de mot de passe renforcée : 12 caractères minimum, complexité, historique, verrouillage après 5 échecs</li>
           </ul>
+
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/nmap1.jpg" alt="Résultat de la commande nmap -sV -A sur le serveur, révélant les services Windows Server 2022 exposés." loading="lazy">
+              <figcaption>nmap -sV -A — détection des services et de l'OS</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/nmap2.jpg" alt="Résultat de la commande nmap --script vuln listant les ports ouverts sur le serveur." loading="lazy">
+              <figcaption>nmap --script vuln — scan de vulnérabilités</figcaption>
+            </figure>
+          </div>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/gpo.jpg" alt="Stratégie de groupe Windows imposant un mot de passe de 12 caractères minimum avec complexité activée." loading="lazy">
+              <figcaption>GPO — politique de mot de passe renforcée</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/hardening.jpg" alt="Terminal PowerShell désactivant SMBv1 et créant une règle de pare-feu restreignant le RDP au VLAN d'administration." loading="lazy">
+              <figcaption>PowerShell — désactivation SMBv1 &amp; règle pare-feu RDP</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Sauvegarde</h2>
+          <p>Une politique de sauvegarde quotidienne (22h00) du volume de partage a été mise en place via Windows Server Backup, avec une rétention de 14 jours glissants. Une exécution manuelle a permis de valider le bon fonctionnement avant la mise en production de la planification.</p>
+          <div class="detail-figures-2">
+            <figure class="detail-figure">
+              <img src="assets/wsbinstall.jpg" alt="Terminal PowerShell installant la fonctionnalité Windows Server Backup." loading="lazy">
+              <figcaption>PowerShell — installation de Windows Server Backup</figcaption>
+            </figure>
+            <figure class="detail-figure">
+              <img src="assets/wsbwizard.jpg" alt="Assistant de planification de sauvegarde Windows Server, configuration du serveur complet." loading="lazy">
+              <figcaption>Assistant de planification de la sauvegarde</figcaption>
+            </figure>
+          </div>
+          <figure class="detail-figure">
+            <img src="assets/backup.jpg" alt="Journal Windows Server Backup confirmant l'état « Réussite » d'une sauvegarde complète du serveur." loading="lazy">
+            <figcaption>Windows Server Backup — sauvegarde complète, état « Réussite »</figcaption>
+          </figure>
         </div>
 
         <div class="detail-block">
@@ -701,97 +804,6 @@
         <div class="detail-block">
           <h2>Résultat</h2>
           <p>Une infrastructure complète et documentée, du schéma réseau jusqu'à la sécurisation applicative, avec des pistes d'amélioration identifiées pour la suite : IDS/IPS, GPO avancées, sauvegarde externalisée et authentification multifacteur pour les comptes à privilèges.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="page" id="projet-etudiants">
-    <div class="wrap" style="padding-block:56px 90px;">
-      <a class="detail-back reveal" href="#projets">← Retour aux projets</a>
-      <div class="detail-head reveal">
-        <span class="detail-icon">
-          <svg viewBox="0 0 100 100" fill="none">
-            <ellipse cx="50" cy="26" rx="26" ry="9" fill="#171d33" stroke="#45d6c0" stroke-width="1.6"/>
-            <path d="M24 26v20c0 5 11.6 9 26 9s26-4 26-9V26" stroke="#45d6c0" stroke-width="1.6"/>
-            <path d="M24 46v20c0 5 11.6 9 26 9s26-4 26-9V46" stroke="#7c6cf0" stroke-width="1.6"/>
-            <line x1="24" y1="46" x2="76" y2="46" stroke="#3a4266" stroke-width="1.2"/>
-          </svg>
-        </span>
-        <div>
-          <p class="project-tag">Projet base de données</p>
-          <h1 style="font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;margin-top:4px;">Gestion des étudiants</h1>
-        </div>
-      </div>
-
-      <div class="detail-body reveal">
-        <p>Un système de gestion des étudiants adossé à une base de données relationnelle dédiée (<em>gestion_etudiant</em>), conçu pour centraliser les informations administratives et pédagogiques d'un établissement : élèves, classes et résultats.</p>
-
-        <div class="detail-meta">
-          <span>MySQL / Oracle SQL</span>
-          <span>Modélisation relationnelle</span>
-        </div>
-
-        <div class="detail-block">
-          <h2>Points clés</h2>
-          <ul class="detail-list">
-            <li>Modélisation relationnelle des entités élèves, classes et notes, avec leurs relations et contraintes d'intégrité</li>
-            <li>Écriture de requêtes SQL pour la gestion des inscriptions, le suivi des résultats et l'extraction de statistiques</li>
-            <li>Structuration d'une base cohérente, pensée pour rester simple à interroger et à faire évoluer</li>
-          </ul>
-        </div>
-
-        <div class="detail-block">
-          <h2>Ce que ce projet démontre</h2>
-          <p>Une bonne maîtrise des fondamentaux des bases de données relationnelles — modélisation, normalisation et requêtage — des compétences directement mobilisées ensuite pour l'administration de bases de données en contexte professionnel.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="page" id="projet-optimel">
-    <div class="wrap" style="padding-block:56px 90px;">
-      <a class="detail-back reveal" href="#projets">← Retour aux projets</a>
-      <div class="detail-head reveal">
-        <span class="detail-icon">
-          <svg viewBox="0 0 100 100" fill="none">
-            <rect x="34" y="34" width="32" height="32" rx="5" fill="#171d33" stroke="#f0a35e" stroke-width="1.6"/>
-            <circle cx="50" cy="50" r="6" fill="none" stroke="#f0a35e" stroke-width="1.6"/>
-            <g stroke="#3a4266" stroke-width="1.6">
-              <line x1="50" y1="34" x2="50" y2="18"/><line x1="50" y1="66" x2="50" y2="82"/>
-              <line x1="34" y1="50" x2="18" y2="50"/><line x1="66" y1="50" x2="82" y2="50"/>
-            </g>
-            <circle cx="50" cy="18" r="3" fill="#7c6cf0"/><circle cx="50" cy="82" r="3" fill="#7c6cf0"/>
-            <circle cx="18" cy="50" r="3" fill="#7c6cf0"/><circle cx="82" cy="50" r="3" fill="#7c6cf0"/>
-          </svg>
-        </span>
-        <div>
-          <p class="project-tag">Projet ingénierie électrique</p>
-          <h1 style="font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;margin-top:4px;">OPTIMEL IA</h1>
-        </div>
-      </div>
-
-      <div class="detail-body reveal">
-        <p>Un projet pluridisciplinaire mené en équipe, à la croisée de l'ingénierie électrique et de l'automatisation intelligente, autour de l'optimisation de dispositifs électriques connectés.</p>
-
-        <div class="detail-meta">
-          <span>Automatisation</span>
-          <span>Électronique</span>
-          <span>Travail d'équipe</span>
-        </div>
-
-        <div class="detail-block">
-          <h2>Points clés</h2>
-          <ul class="detail-list">
-            <li>Automatisation intelligente de dispositifs électriques pour en optimiser le fonctionnement</li>
-            <li>Approche croisée entre conception électronique et logique de pilotage logicielle</li>
-            <li>Travail en équipe sur un cas concret d'optimisation, de l'idée à la mise en œuvre</li>
-          </ul>
-        </div>
-
-        <div class="detail-block">
-          <h2>Ce que ce projet démontre</h2>
-          <p>Une capacité à travailler à l'interface de plusieurs disciplines techniques et à collaborer efficacement en équipe sur un cas concret — une approche transversale utile dans des environnements IT où réseau, système et matériel se croisent.</p>
         </div>
       </div>
     </div>
@@ -902,7 +914,7 @@
 
   // ---- page router ----
   var NAV_PAGES = ['accueil', 'a-propos', 'projets', 'certifications', 'contact'];
-  var DETAIL_PAGES = ['projet-infra', 'projet-etudiants', 'projet-optimel'];
+  var DETAIL_PAGES = ['projet-infra'];
   var PAGES = NAV_PAGES.concat(DETAIL_PAGES);
   var pageEls = {};
   PAGES.forEach(function (id) { pageEls[id] = document.getElementById(id); });
