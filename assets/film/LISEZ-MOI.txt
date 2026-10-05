@@ -23,3 +23,6 @@ AJOUT : deux chapitres supplémentaires (film d'environ 1 minute)
   voix-7.mp3   « Nous montons aussi vos vidéos : souvenirs, événements, formats courts pour les réseaux. On garde ce qui compte, on coupe le reste. »
   voix-8.mp3   « Et nous soignons votre présence en ligne : vos profils, vos visuels, et des conseils concrets pour qu'on vous trouve. »
 Les fichiers voix-1 à voix-6 sont déjà en place. Sans voix-7 et voix-8, ces deux chapitres restent muets côté voix.
+
+CONCLUSION (carte finale, après « Un projet ? Parlons-en. »)
+  voix-9.mp3   « Alors, qu'attendez-vous pour bondir sur Kinéo ? » (avec le rire)

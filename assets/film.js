@@ -339,7 +339,7 @@
     "Nous montons aussi vos vidéos : souvenirs, événements, formats courts pour les réseaux. On garde ce qui compte, on coupe le reste.",
     "Et nous soignons votre présence en ligne : vos profils, vos visuels, et des conseils concrets pour qu'on vous trouve.",
   ];
-  var VFILE = [1, 2, 3, 4, 5, 7, 8, 6]; // fichier de chaque chapitre ; le dernier (carte finale) est voix-6
+  var VFILE = [1, 2, 3, 4, 5, 7, 8, 6, 9]; // fichier de chaque chapitre ; carte finale : voix-6 puis la conclusion voix-9
   var AC = null, master = null, soundOn = false, musicTimer = 0, musicGain = null, noiseB = null;
   function ac() {
     if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AC = new C(); master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination); }
@@ -402,6 +402,7 @@
     a.addEventListener("loadedmetadata", function () { a.ok = isFinite(a.duration); retime(); });
     return a;
   });
+  VOICE[CH.length].addEventListener("ended", function () { if (playing && soundOn && t >= BODY) setTimeout(function () { if (playing && soundOn && t >= BODY) { var a = VOICE[CH.length + 1]; if (a.ok) { a.currentTime = 0; a.play().catch(function () {}); } } }, 450); });
   function stopVoices(reset) { VOICE.forEach(function (a) { a.pause(); if (reset) { try { a.currentTime = 0; } catch (e) {} } }); }
   function playVoice(i, fromStart) { if (!soundOn || !VOICE[i].ok) return; stopVoices(true); var a = VOICE[i]; if (fromStart) a.currentTime = 0; a.play().catch(function () {}); }
   function retime() {
@@ -411,7 +412,8 @@
       START[i] = acc; acc += c.d;
       var li = clipsEl.children[i]; if (li) li.style.setProperty("--d", c.d);
     });
-    BODY = acc; TOTAL = BODY + (VOICE[CH.length].ok ? Math.max(5, VOICE[CH.length].duration + 1.2) : 5);
+    var e1 = VOICE[CH.length], e2 = VOICE[CH.length + 1];
+    BODY = acc; TOTAL = BODY + Math.max(5, (e1.ok ? e1.duration + .5 : 0) + (e2.ok ? e2.duration : 0) + 1.2);
     if (!playing) render(t);
   }
   function startAudio() {
