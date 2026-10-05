@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bryant Ouaogninlin — Sites, montage, digital</title>
+<title>Kinéo — Sites, montage, digital</title>
+<link rel="icon" type="image/svg+xml" href="assets/kineo-mark.svg">
 <meta name="description" content="Création de sites web, montage vidéo et accompagnement digital pour les particuliers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +46,9 @@ ul,ol{padding:0;list-style:none}
 .nav{position:sticky;top:0;z-index:80;background:var(--paper);border-bottom:1px solid var(--ink)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
 .logo{font-family:var(--f-display);font-weight:800;font-size:1.15rem;text-decoration:none;display:flex;align-items:center;gap:10px}
-.logo i{width:12px;height:12px;border-radius:50%;background:var(--rec);display:block}
+.logo .mark{width:30px;height:30px;display:block}
+.logo .wm{font-size:1.45rem;letter-spacing:-.04em;line-height:1}
+.logo .wm b{font-weight:800;color:var(--rec)}
 .tc{font-family:var(--f-mono);font-size:.8rem;font-variant-numeric:tabular-nums;color:var(--muted)}
 .nav ul{display:flex;gap:28px;font-family:var(--f-display);font-weight:500;font-size:.95rem}
 .nav ul a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
@@ -169,7 +172,7 @@ footer a{text-underline-offset:3px}
 
 <header class="nav">
   <div class="wrap">
-    <a class="logo" href="#top"><i></i>Bryant Ouaogninlin</a>
+    <a class="logo" href="#top" aria-label="Kinéo, accueil"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="5" width="7" height="30" fill="currentColor"/><path d="M15 21 30 6" stroke="var(--rec)" stroke-width="7" fill="none"/><path d="M15 19 30 34" stroke="currentColor" stroke-width="7" fill="none"/></svg><span class="wm">kin<b>é</b>o</span></a>
     <ul>
       <li><a href="#services">Services</a></li>
       <li><a href="#demarche">Démarche</a></li>
@@ -271,7 +274,7 @@ footer a{text-underline-offset:3px}
     <div class="photo rv">À COMPLÉTER<br>Ta photo</div>
     <div class="rv">
       <p class="mono" style="color:var(--rec);margin-bottom:18px">04 — À propos</p>
-      <p>Je m'appelle Bryant. Je fais des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre, sans jargon et sans surprise sur le résultat.</p>
+      <p>Je m'appelle Bryant, et Kinéo est mon studio. Je fais des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre, sans jargon et sans surprise sur le résultat.</p>
       <p>Je travaille avec vous du début à la fin : vous avez un seul interlocuteur, et vous voyez le projet avancer à chaque étape. <span class="todo">À compléter : ton parcours, 2-3 phrases</span></p>
     </div>
   </div>
@@ -289,7 +292,7 @@ footer a{text-underline-offset:3px}
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Bryant Ouaogninlin</span>
+    <span>© 2026 Kinéo</span>
     <span><a href="legal.html">Mentions légales &amp; confidentialité</a> · <a href="cyber.html">Portfolio cybersécurité</a></span>
   </div>
 </footer>
