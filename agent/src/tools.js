@@ -1,7 +1,7 @@
 // Les outils que Claude peut appeler, et leur exécution côté serveur.
 import { etapeLabel } from "./config.js";
 import { notifyOwner } from "./notify.js";
-import { fmtFcfa, payLink } from "./pay.js";
+import { bankInfo, declarePayment, fmtFcfa, manualOperators, payLink } from "./pay.js";
 import { getLead, getProject, paymentsFor, projectsFor, saveCallback, saveLead, setHuman } from "./store.js";
 
 const TYPES = ["site", "video", "digital", "autre"];
@@ -44,6 +44,22 @@ export const TOOLS = [
       "Donne les paiements et les liens de paiement du client (montant, objet, statut). Sert à répondre « j'ai payé, avez-vous reçu ? » ou à renvoyer un lien de paiement encore en attente. Tu ne crées jamais de lien toi-même : c'est l'équipe qui les émet.",
     strict: true,
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
+    name: "declare_payment",
+    description:
+      "Enregistre que le client dit avoir payé (Mobile Money ou virement bancaire). Cela NE valide PAS le paiement : l'équipe vérifie dans son application et confirme. À appeler quand le client écrit « j'ai payé » ou envoie une référence de transaction. Dis-lui ensuite que l'équipe vérifie et qu'il recevra une confirmation.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        reference: { type: "string", description: "Référence du paiement (commence par KP), ou chaîne vide pour prendre le dernier paiement en attente" },
+        operator: { type: "string", enum: ["Wave", "Orange Money", "MTN MoMo", "Moov Money", "Virement bancaire", "autre"], description: "Moyen utilisé par le client" },
+        transaction_reference: { type: "string", description: "Numéro de transaction donné par le client, ou chaîne vide" },
+      },
+      required: ["reference", "operator", "transaction_reference"],
+      additionalProperties: false,
+    },
   },
   {
     name: "request_callback",
@@ -124,14 +140,26 @@ export async function runTool(env, ctx, name, input) {
     case "get_payments": {
       const list = (await paymentsFor(env, ctx.wa)).slice(0, 5);
       if (!list.length) return JSON.stringify({ found: false, message: "Aucun paiement ni lien de paiement pour ce numéro. Si le client attend un lien, propose de passer la main à l'équipe." });
-      const statut = { pending: "en attente de paiement", paid: "payé", failed: "échoué" };
+      const statut = { pending: "en attente de paiement", declared: "annoncé par le client, en cours de vérification par l'équipe", paid: "payé", failed: "échoué ou refusé" };
       return JSON.stringify({
         found: true,
         paiements: list.map((p) => ({
           reference: p.ref, objet: p.label, montant: fmtFcfa(p.amount), statut: statut[p.status] || p.status,
           lien_de_paiement: p.status === "pending" ? payLink(env, p.ref) : undefined,
+          moyens_de_paiement: p.mode === "manual" && p.status === "pending"
+            ? [...manualOperators(env).map((o) => `${o.operator} : ${o.number}`), ...(bankInfo(env) ? [`Virement bancaire : ${bankInfo(env).bank} ${bankInfo(env).holder} ${bankInfo(env).rib}`.replace(/\s+/g, " ")] : [])]
+            : undefined,
         })),
       });
+    }
+
+    case "declare_payment": {
+      const mine = await paymentsFor(env, ctx.wa);
+      const ref = String(input.reference || "").trim().toUpperCase();
+      const target = ref ? mine.find((p) => p.ref === ref) : mine.find((p) => p.mode === "manual" && p.status === "pending");
+      if (!target) return JSON.stringify({ ok: false, message: "Aucun paiement en attente pour ce client. Propose de passer la main à l'équipe." });
+      const r = await declarePayment(env, target.ref, { operator: input.operator === "autre" ? "" : input.operator, txref: input.transaction_reference, wa: ctx.wa });
+      return JSON.stringify(r.ok ? { ok: true, statut: r.status, message: r.status === "paid" ? "Ce paiement est déjà confirmé." : "L'équipe a été prévenue et vérifie le paiement. Dis au client qu'il recevra une confirmation ici." } : { ok: false, message: r.error });
     }
 
     case "request_callback": {

@@ -118,7 +118,7 @@ console.log("\n2. Un nouveau client : l'agent enregistre la demande et répond")
   ok(req1.output_config?.effort === "medium", "effort réglé explicitement");
   ok(req1.temperature === undefined && req1.top_p === undefined && req1.thinking === undefined, "aucun paramètre refusé par ce modèle (température, thinking)");
   ok(req1.system[0].cache_control?.type === "ephemeral" && !JSON.stringify(req1.system[0]).includes("Abidjan"), "le bloc stable est mis en cache, sans donnée qui change");
-  ok(req1.tools.length === 5 && req1.tools.every((t) => t.strict === true), "5 outils, arguments garantis par le schéma (strict)");
+  ok(req1.tools.length === 6 && req1.tools.every((t) => t.strict === true), "6 outils, arguments garantis par le schéma (strict)");
   const last = req2.messages[req2.messages.length - 1];
   ok(last.role === "user" && last.content[0].type === "tool_result" && last.content[0].tool_use_id === "tu_1", "le résultat de l'outil est renvoyé à Claude dans un seul message");
 
@@ -290,6 +290,82 @@ console.log("\n6. Paiements CinetPay");
   w.cinetpayInitFail = true;
   await own("/paiement K-001 5000 | test");
   ok(lastOwner().includes("CinetPay a refusé"), "si CinetPay refuse la demande, vous recevez une explication");
+}
+
+console.log("\n7. Paiement manuel : Mobile Money et virement bancaire (sans CinetPay)");
+{
+  const M = "2250505000008";
+  const w = makeWorld([]);
+  const env = { ...mkEnv(w), CINETPAY_API_KEY: undefined, CINETPAY_SITE_ID: undefined, MM_WAVE: "07 00 00 00 01", MM_ORANGE: "07 00 00 00 02", MM_HOLDER: "Bryant O.", BANK_NAME: "Banque Test CI", BANK_RIB: "CI93 0000 0000 0000 0000 0000" };
+  const own = (t) => post(env, webhook(OWNER, t, { name: "Moi" }));
+  const lastOwner = () => textsTo(w, OWNER).at(-1);
+  const api = async (path, init) => { const waits = []; const res = await worker.fetch(new Request("https://agent.test" + path, init), env, { waitUntil: (p) => waits.push(p) }); await Promise.all(waits); return res; };
+
+  await own("/nouveau 05 05 00 00 08 | Fanta | video | Clip de mariage");
+  await own("/paiement K-001 12345 | acompte");
+  ok(w.cinetpay.length === 0, "sans clés CinetPay, aucun appel n'est fait : le mode manuel s'active tout seul");
+  const msg = textsTo(w, M).at(-1);
+  ok(msg.includes("07 00 00 00 01") && msg.includes("Wave") && msg.includes("Orange Money") && msg.includes("Bryant O."), "le client reçoit les numéros Mobile Money et le nom du titulaire");
+  ok(msg.includes("virement bancaire") && msg.includes("CI93 0000") && msg.includes("Banque Test CI"), "le client reçoit aussi les coordonnées bancaires pour un virement");
+  const ref = (msg.match(/KP[A-Z0-9]{8}/) || [])[0];
+  ok(ref && msg.includes(`paiement.html?ref=${ref}`) && msg.includes("12 345 FCFA"), "la référence et le lien vers le site sont indiqués (12 345 : pas besoin d'être multiple de 5)");
+
+  // le site lit les instructions, tant que le paiement n'est pas réglé
+  const st = await (await api(`/pay/status?ref=${ref}`)).json();
+  ok(st.mode === "manual" && st.status === "pending" && st.instructions.operators.length === 2 && st.instructions.bank.rib.startsWith("CI93") && st.instructions.holder === "Bryant O.", "la page du site obtient les moyens de paiement du paiement concerné");
+  ok(!JSON.stringify(st).includes(M), "aucun numéro de client dans le statut public");
+  ok((await api("/pay/status?ref=INCONNU12")).status === 404, "une référence inconnue ne révèle rien");
+
+  // le client annonce depuis le site
+  const body = (o) => ({ method: "POST", body: JSON.stringify(o), headers: { "content-type": "application/json" } });
+  const d1 = await api("/pay/declare", body({ ref, operator: "Virement bancaire", txref: "TX-998877" }));
+  ok((await d1.json()).status === "declared", "« J'ai payé » passe le paiement à « annoncé »");
+  ok(lastOwner().includes("Paiement annoncé") && lastOwner().includes("Virement bancaire") && lastOwner().includes("TX-998877") && lastOwner().includes(`/confirme ${ref}`), "vous êtes alerté avec le moyen, la transaction et la commande pour valider");
+  ok(JSON.parse(await env.KV.get(`pay:${ref}`)).status === "declared" && !JSON.parse(await env.KV.get("proj:K-001")).paid, "annoncé ne veut pas dire payé : rien n'est validé");
+  const alerts = textsTo(w, OWNER).length;
+  await api("/pay/declare", body({ ref, operator: "Wave" }));
+  ok(textsTo(w, OWNER).length === alerts, "un second clic ne vous renvoie pas d'alerte (anti-spam)");
+  ok((await api("/pay/declare", body({ ref: "KPINCONNU", operator: "Wave" }))).status === 404 && (await api("/pay/declare", { method: "POST", body: "pas du json" })).status === 400, "références et requêtes invalides refusées");
+  const cors = await api("/pay/declare", { method: "OPTIONS" });
+  ok(cors.status === 204 && cors.headers.get("access-control-allow-methods").includes("POST"), "le site est autorisé à envoyer l'annonce (CORS)");
+
+  // vous vérifiez et confirmez
+  await own("/paiements");
+  ok(lastOwner().includes("annoncé : à vérifier"), "/paiements montre ce qu'il faut vérifier");
+  await own(`/confirme ${ref}`);
+  const paid = JSON.parse(await env.KV.get(`pay:${ref}`));
+  ok(paid.status === "paid" && paid.method === "Virement bancaire", "/confirme valide le paiement avec le moyen annoncé");
+  ok(JSON.parse(await env.KV.get("proj:K-001")).paid === 12345 && textsTo(w, M).at(-1).includes("bien reçu votre paiement"), "le projet est crédité et le client est remercié");
+  await own(`/confirme ${ref}`);
+  ok(lastOwner().includes("déjà payé"), "on ne peut pas confirmer deux fois");
+  const st2 = await (await api(`/pay/status?ref=${ref}`)).json();
+  ok(st2.status === "paid" && st2.instructions === undefined, "une fois payé, les numéros ne sont plus exposés");
+
+  // l'agent : le client dit « j'ai payé » sur WhatsApp
+  await own("/paiement K-001 5000 | solde");
+  const ref2 = textsTo(w, M).at(-1).match(/KP[A-Z0-9]{8}/)[0];
+  w.script = [toolUse("tu_d", "declare_payment", { reference: "", operator: "Wave", transaction_reference: "WV123" }), say("Merci, l'équipe vérifie et vous confirmera.")];
+  await post(env, webhook(M, "j'ai payé par wave, transaction WV123", { name: "Fanta" }));
+  const dp = w.anthropic.at(-1).body.messages.at(-1).content[0].content;
+  ok(dp.includes('"statut":"declared"') && lastOwner().includes("Paiement annoncé") && lastOwner().includes("WV123"), "l'agent enregistre l'annonce du client et vous alerte, sans rien valider");
+  ok(JSON.parse(await env.KV.get(`pay:${ref2}`)).status === "declared", "le paiement du solde est « annoncé »");
+
+  // un autre client ne peut pas annoncer le paiement de quelqu'un d'autre
+  w.script = [toolUse("tu_e", "declare_payment", { reference: ref2, operator: "Wave", transaction_reference: "" }), say("Je ne trouve rien.")];
+  await post(env, webhook("2250505000009", "j'ai payé", { name: "Intrus" }));
+  ok(w.anthropic.at(-1).body.messages.at(-1).content[0].content.includes('"ok":false'), "un autre client ne peut pas déclarer le paiement d'autrui");
+
+  // refus
+  await own("/paiement K-001 7000 | retouches");
+  const ref3 = textsTo(w, M).at(-1).match(/KP[A-Z0-9]{8}/)[0];
+  await own(`/annule ${ref3}`);
+  ok(JSON.parse(await env.KV.get(`pay:${ref3}`)).status === "failed", "/annule refuse un paiement");
+
+  // aucune configuration : message clair
+  const env2 = { ...mkEnv(w), CINETPAY_API_KEY: undefined, CINETPAY_SITE_ID: undefined };
+  const { handleOwnerCommand } = await import("../src/owner.js");
+  const txt = await handleOwnerCommand(env2, "/paiement 2250505000008 5000 | test", new Request("https://agent.test/x"));
+  ok(txt.includes("Aucun moyen de paiement manuel"), "sans aucun numéro configuré, vous recevez un message d'aide plutôt qu'une erreur");
 }
 
 console.log(`\n${passed} réussis, ${failed} échoués`);

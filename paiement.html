@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=26">
+<link rel="stylesheet" href="assets/site.css?v=27">
 </head>
 <body>
 <div class="playhead" id="playhead" aria-hidden="true"></div>
@@ -27,7 +27,7 @@
 <section class="phero"><div class="wrap">
   <span class="mono" data-scramble>Paiement</span>
   <h1><span class="w"><span>Payer</span></span> <span class="w"><span>en</span></span> <span class="w"><span>toute</span></span> <span class="w"><span><em>sécurité.</em></span></span></h1>
-  <p class="lead">Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire : vous choisissez sur la page sécurisée, selon ce qui est disponible pour vous.</p>
+  <p class="lead">Mobile Money, virement bancaire : vous payez avec le moyen qui vous arrange, et chaque paiement est confirmé. Vous en recevez la preuve.</p>
 </div></section>
 
 <section style="padding-top:20px"><div class="wrap">
@@ -62,6 +62,34 @@
       <p class="mono pay-ref">Réf. <span data-f="ref"></span></p>
     </div>
 
+    <div class="pay-card" id="pay-manual" hidden>
+      <span class="mono">En attente de paiement</span>
+      <p class="pay-label" data-f="label"></p>
+      <p class="pay-amount" data-f="amount"></p>
+      <p class="pay-how">Envoyez ce montant avec l'un de ces moyens :</p>
+      <ul class="ops" id="pay-ops"></ul>
+      <p class="pay-note" id="pay-holder"></p>
+      <p class="pay-note">Indiquez la référence <b data-f="ref"></b> en commentaire ou en motif du virement, si votre application le permet.</p>
+      <form id="pay-declare" class="pay-declare" autocomplete="off">
+        <p class="pay-how">Une fois payé, prévenez-nous :</p>
+        <label class="sr" for="pay-method">Moyen utilisé</label>
+        <select id="pay-method" required></select>
+        <label class="sr" for="pay-tx">Numéro de transaction (facultatif)</label>
+        <input id="pay-tx" type="text" maxlength="40" placeholder="N° de transaction (facultatif)">
+        <button class="btn solid" type="submit">J'ai payé</button>
+      </form>
+      <p class="mono pay-ref">Réf. <span data-f="ref"></span></p>
+    </div>
+
+    <div class="pay-card" id="pay-declared" hidden>
+      <span class="mono">Paiement annoncé</span>
+      <h2>Merci, nous vérifions votre paiement.</h2>
+      <p class="pay-label" data-f="label"></p>
+      <p class="pay-amount" data-f="amount"></p>
+      <p>Dès que nous l'avons vérifié, cette page se met à jour et vous recevez une confirmation sur WhatsApp.</p>
+      <p class="mono pay-ref">Réf. <span data-f="ref"></span></p>
+    </div>
+
     <div class="pay-card pay-ok" id="pay-paid" hidden>
       <div class="scene wide" id="pay-win"></div>
       <span class="mono">Paiement reçu</span>
@@ -93,20 +121,22 @@
   <ol class="steps3">
     <li class="rv"><span class="mono">01</span><b>Vous validez le devis</b><p>Le montant et les modalités (acompte, solde) sont fixés dans votre devis, jamais autrement.</p></li>
     <li class="rv" style="transition-delay:.1s"><span class="mono">02</span><b>Vous recevez un lien</b><p>Un lien de paiement personnel vous est envoyé par WhatsApp. Il ne sert que pour ce paiement.</p></li>
-    <li class="rv" style="transition-delay:.2s"><span class="mono">03</span><b>Vous payez, c'est confirmé</b><p>Vous choisissez votre moyen de paiement, et la confirmation s'affiche ici et sur WhatsApp.</p></li>
+    <li class="rv" style="transition-delay:.2s"><span class="mono">03</span><b>Vous payez, nous confirmons</b><p>Vous payez avec le moyen de votre choix. Dès que le paiement est vérifié, la confirmation s'affiche ici et sur WhatsApp.</p></li>
   </ol>
 </div></section>
 
 <section><div class="wrap sec-grid">
   <div class="rv">
     <p class="mono" style="color:var(--rec);margin-bottom:14px">Moyens de paiement</p>
-    <ul class="methods"><li>Wave</li><li>Orange Money</li><li>MTN MoMo</li><li>Moov Money</li><li>Carte Visa / Mastercard</li></ul>
-    <p class="pay-note">Les moyens proposés s'affichent sur la page de paiement et peuvent varier selon votre opérateur. Les montants sont en francs CFA (FCFA).</p>
+    <ul class="methods"><li>Wave</li><li>Orange Money</li><li>MTN MoMo</li><li>Moov Money</li><li>Virement bancaire</li><li data-only="cinetpay">Carte Visa / Mastercard</li></ul>
+    <p class="pay-note">Les moyens proposés pour votre paiement sont indiqués sur votre lien. Les montants sont en francs CFA (FCFA).</p>
   </div>
   <div class="rv">
     <p class="mono" style="color:var(--rec);margin-bottom:14px">Votre sécurité</p>
-    <p class="big2">Kinéo ne voit et ne conserve jamais votre numéro de carte, votre code secret ni votre code reçu par SMS.</p>
-    <p class="pay-note">Le paiement se fait sur la page sécurisée de notre prestataire, CinetPay. Ne communiquez jamais ces informations par message, même à quelqu'un qui dit venir de chez nous.</p>
+    <p class="big2">Nous ne vous demanderons jamais votre code secret (PIN), un code reçu par SMS ni votre numéro de carte.</p>
+    <p class="pay-note" data-only="manual">Vous payez directement depuis votre application Mobile Money ou votre banque, vers les coordonnées indiquées sur votre lien. Chaque paiement est vérifié à la main avant d'être confirmé.</p>
+    <p class="pay-note" data-only="cinetpay">Le paiement se fait sur la page sécurisée de notre prestataire, CinetPay : Kinéo ne voit ni ne conserve vos informations de carte.</p>
+    <p class="pay-note">Ne communiquez jamais ces informations par message, même à quelqu'un qui dit venir de chez nous. En cas de doute, écrivez-nous avant de payer.</p>
   </div>
 </div></section>
 
@@ -121,10 +151,10 @@
     <span><a href="https://wa.me/2250105483481?text=Bonjour%20Kin%C3%A9o%2C%20j%27ai%20un%20projet." target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.tiktok.com/@cherklaw" target="_blank" rel="noopener">TikTok</a> · <a href="legal.html">Mentions légales &amp; confidentialité</a></span>
   </div>
 </footer>
-<script src="assets/config.js?v=1"></script>
+<script src="assets/config.js?v=27"></script>
 <script src="assets/site.js?v=26"></script>
 <script src="assets/fx.js?v=26"></script>
-<script src="assets/pay.js?v=1"></script>
+<script src="assets/pay.js?v=28"></script>
 <script type="module" src="assets/scenes.js?v=26"></script>
 </body>
 </html>

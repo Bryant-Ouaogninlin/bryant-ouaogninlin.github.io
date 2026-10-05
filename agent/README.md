@@ -105,36 +105,63 @@ Seul `OWNER_NUMBER` peut utiliser ces commandes :
 
 Étapes : `discussion`, `proposition`, `ajustements`, `livraison`, `termine`.
 
-## Paiements (CinetPay)
+## Paiements
 
-Les clients paient sur la page sécurisée de **CinetPay** (Wave, Orange Money, MTN MoMo, Moov Money, cartes Visa/Mastercard selon disponibilité).
-Kinéo ne voit jamais de numéro de carte ni de code secret. Commission annoncée par CinetPay : de l'ordre de 1,5 à 2 % selon l'offre
-(à vérifier dans votre contrat). Le franc CFA (XOF) est la devise ; **le montant doit être un multiple de 5**.
+Deux modes, choisis automatiquement :
+
+- **Mobile Money et virement bancaire (mode par défaut, sans intermédiaire).** Le client envoie l'argent sur vos numéros Wave, Orange Money, MTN MoMo ou Moov Money,
+  ou par virement sur votre compte. **Vous confirmez vous-même chaque paiement** après l'avoir vu arriver dans votre application ou sur votre relevé.
+  Aucun registre de commerce ni compte marchand n'est nécessaire.
+- **CinetPay (lien de paiement en ligne)**, dès que `CINETPAY_API_KEY` et `CINETPAY_SITE_ID` sont renseignés. Pour rester en mode manuel même avec ces clés, ajoutez `PAY_MODE=manual`.
+
+### Mode Mobile Money / virement
 
 **Comment ça se passe**
-1. Vous écrivez à l'agent : `/paiement K-001 50000 | acompte`. L'agent crée le lien chez CinetPay et l'envoie au client par WhatsApp.
-2. Le client ouvre la page `paiement.html` du site, clique *Payer maintenant*, choisit son moyen de paiement chez CinetPay.
-3. CinetPay prévient le Worker (`/pay/notify`). **Le Worker ne croit pas cet appel** : il redemande le statut à CinetPay, et vérifie le montant
-   et la devise. Seulement alors, le paiement est marqué *payé*, vous êtes prévenu et le client reçoit un accusé de réception.
-4. La page du site se met à jour toute seule (le lapin fête ça).
+1. Vous écrivez à l'agent : `/paiement K-001 50000 | acompte`. Le client reçoit sur WhatsApp vos numéros, votre RIB, une **référence** (ex. `KP4X7M2QHN`) et un lien vers la page de paiement du site.
+2. Il paie avec l'application de son choix, puis appuie sur **« J'ai payé »** sur la page (ou répond « j'ai payé » à l'agent, qui enregistre l'annonce).
+3. **Vous recevez une alerte** avec le moyen, le numéro de transaction éventuel et la commande à envoyer. Vous vérifiez dans votre application Mobile Money ou sur votre compte bancaire.
+4. Vous envoyez `/confirme KP4X7M2QHN` : le paiement devient *payé*, le projet est crédité, le client reçoit un accusé de réception et la page du site se met à jour (le lapin fête ça).
+   Si vous ne voyez rien arriver : `/annule KP4X7M2QHN`.
 
-**Commandes** : `/paiement K-001 50000 | acompte`, `/paiement 2250505483481 25000 | retouches` (sans projet), `/paiements`
-(liste), `/paye K-001 10000 | espèces` (paiement reçu hors ligne). L'agent peut renvoyer un lien en attente quand le client le demande.
+Un client qui dit avoir payé **ne valide jamais** un paiement lui-même, et l'agent non plus. Seule votre commande `/confirme` le fait.
 
-**Mise en route**
-1. Créez un compte marchand sur **cinetpay.com** et faites valider votre activité (pièces d'identité ; selon votre statut, des documents d'entreprise).
-2. Dans votre espace marchand, récupérez la **clé API** et le **Site ID**.
-3. Ajoutez-les comme secrets Cloudflare : `CINETPAY_API_KEY` et `CINETPAY_SITE_ID`.
-4. Activez la page de paiement du site : dans `assets/config.js`, mettez l'adresse du Worker (`window.KINEO = { api: "https://kineo-agent.….workers.dev" }`).
-5. Faites un premier paiement test d'un petit montant (par exemple 100 FCFA) avant d'ouvrir au public.
+**À renseigner dans Cloudflare** (*Settings → Variables and Secrets*, type « Secret » de préférence ; ces coordonnées ne sont jamais écrites dans le dépôt) :
 
-Variables facultatives : `SITE_URL` (adresse du site, par défaut celle de GitHub Pages), `WORKER_URL` (adresse du Worker, sinon déduite de la requête),
-`CONTACT_EMAIL`. Modèles WhatsApp facultatifs pour écrire hors fenêtre de 24 h : `TEMPLATE_PAYMENT_LINK` (3 variables : prénom, montant, lien) et
-`TEMPLATE_PAYMENT_OK` (3 variables : prénom, montant, référence).
+| Nom | Exemple |
+|---|---|
+| `MM_WAVE` | `07 00 00 00 01` |
+| `MM_ORANGE` | `07 00 00 00 02` |
+| `MM_MTN` | `05 00 00 00 03` |
+| `MM_MOOV` | `01 00 00 00 04` |
+| `MM_HOLDER` | Le nom inscrit sur ces comptes Mobile Money |
+| `BANK_NAME`, `BANK_HOLDER`, `BANK_RIB` | Banque, titulaire et RIB/IBAN, pour les virements |
 
-**Sécurité des paiements** : la notification n'est jamais crue sans vérification auprès de CinetPay ; un paiement dont le montant ne correspond
-pas est refusé et vous êtes alerté ; une notification en double ne fait rien de plus ; le statut public d'un paiement ne contient aucune donnée
-personnelle et n'est lisible que depuis le site (CORS) avec une référence longue et aléatoire ; seul le propriétaire peut créer un lien.
+Renseignez seulement ce que vous utilisez. **Ces numéros et ce RIB seront vus par vos clients** (par WhatsApp et sur la page de paiement, uniquement pour celui qui a la référence).
+
+**Commandes** : `/paiement K-001 50000 | acompte`, `/paiement 2250505483481 25000 | retouches` (sans projet), `/paiements` (liste ; « annoncé : à vérifier » = à contrôler),
+`/confirme KP…`, `/annule KP…`, `/paye K-001 10000 | espèces` (paiement reçu hors ligne). Tout montant entier d'au moins 100 FCFA est accepté.
+
+**Pour activer la page du site** : dans `assets/config.js`, mettez l'adresse du Worker : `window.KINEO = { api: "https://kineo-agent.….workers.dev", mode: "manual" };`.
+
+**À savoir** : ce mode demande votre vigilance. Contrôlez le nom, le montant et la date avant chaque `/confirme`, et gardez vos relevés.
+Les montants encaissés à votre nom ont des conséquences fiscales : renseignez-vous auprès du CEPICI ou d'un professionnel.
+
+### Mode CinetPay (plus tard)
+
+Les clients paient sur la page sécurisée de **CinetPay** (Wave, Orange Money, MTN MoMo, Moov Money, cartes). CinetPay demande une vérification d'identité
+et peut demander des documents d'activité (voir leur FAQ) ; commission annoncée de l'ordre de 1,5 à 2 % (à vérifier dans votre contrat).
+Le montant doit y être un multiple de 5.
+
+1. Le Worker crée le lien chez CinetPay ; le client paie ; CinetPay prévient le Worker (`/pay/notify`).
+2. **Le Worker ne croit pas cet appel** : il redemande le statut à CinetPay et vérifie le montant et la devise avant de valider.
+3. Secrets : `CINETPAY_API_KEY`, `CINETPAY_SITE_ID`. Dans `assets/config.js`, passez `mode` à `"cinetpay"`.
+
+Variables facultatives : `SITE_URL`, `WORKER_URL`, `CONTACT_EMAIL`, `PAY_MODE`. Modèles WhatsApp facultatifs (hors fenêtre de 24 h) :
+`TEMPLATE_PAYMENT_LINK` (prénom, montant, lien) et `TEMPLATE_PAYMENT_OK` (prénom, montant, référence).
+
+**Sécurité** : le statut public d'un paiement ne contient aucune donnée personnelle et n'est lisible que depuis le site (CORS), avec une référence longue
+et aléatoire ; seul le propriétaire peut créer un lien ; les annonces « J'ai payé » sont limitées à une par minute et par référence ; une notification
+en double ne fait rien de plus.
 
 ## Limites à connaître
 
@@ -169,4 +196,4 @@ npm install
 npm test
 ```
 
-55 contrôles simulent Meta, Claude et CinetPay : signature, doublons, mémoire, suivi de projet, passage de relais, pannes, anti-abus, paiements (vérification, montants, doublons).
+78 contrôles simulent Meta, Claude et CinetPay : signature, doublons, mémoire, suivi de projet, passage de relais, pannes, anti-abus, paiements CinetPay (vérification, montants, doublons) et paiements manuels (annonce, confirmation, isolation des clients).

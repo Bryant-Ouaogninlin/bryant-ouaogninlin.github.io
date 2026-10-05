@@ -16,6 +16,7 @@ id = "REMPLACER_PAR_L_ID_DU_KV"
 # Secrets à ajouter dans Cloudflare (jamais dans ce fichier) :
 #   ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_PHONE_ID,
 #   WHATSAPP_VERIFY_TOKEN, WHATSAPP_APP_SECRET, OWNER_NUMBER,
-#   CINETPAY_API_KEY, CINETPAY_SITE_ID   (paiements, voir README)
+#   MM_WAVE, MM_ORANGE, MM_MTN, MM_MOOV, MM_HOLDER, BANK_NAME, BANK_HOLDER, BANK_RIB   (paiement manuel, voir README)
+#   CINETPAY_API_KEY, CINETPAY_SITE_ID   (plus tard, si vous ouvrez un compte CinetPay)
 # Optionnels (messages proactifs hors fenêtre de 24 h) :
 #   TEMPLATE_OWNER_ALERT, TEMPLATE_PROJECT_UPDATE, TEMPLATE_PAYMENT_LINK, TEMPLATE_PAYMENT_OK

@@ -1,7 +1,7 @@
 // Commandes réservées au propriétaire : il pilote l'agent depuis son propre WhatsApp.
 import { FACTS, etapeLabel } from "./config.js";
 import { createProject, getProject, listLeads, listPayments, listProjects, projectsFor, setHuman, updateProject } from "./store.js";
-import { createPayment, fmtFcfa, payLink, recordManualPayment } from "./pay.js";
+import { cancelPayment, confirmPayment, createPayment, fmtFcfa, manualMessage, payLink, recordManualPayment } from "./pay.js";
 import { isWindowError, normalizeNumber, sendTemplate, sendText } from "./whatsapp.js";
 
 const AIDE = `Commandes Kinéo
@@ -12,9 +12,11 @@ const AIDE = `Commandes Kinéo
 /etape K-001 proposition | message pour le client (facultatif) : change l'étape et prévient le client
    étapes : discussion, proposition, ajustements, livraison, termine
 /note K-001 texte : note interne (non visible du client)
-/paiement K-001 50000 | acompte : crée un lien de paiement (montant multiple de 5) et l'envoie au client
+/paiement K-001 50000 | acompte : envoie au client le moyen de payer (vos numéros Mobile Money et votre RIB, ou un lien CinetPay)
 /paiement 2250505483481 25000 | Retouches : idem pour un client sans projet
 /paiements : les 10 derniers paiements
+/confirme KP… : vous avez reçu l'argent (Mobile Money ou virement) : valide le paiement
+/annule KP… : refuse un paiement annoncé
 /paye K-001 25000 | espèces : enregistre un paiement reçu hors ligne
 /prendre 225XXXXXXXXXX : l'agent se tait pour ce client
 /reprendre 225XXXXXXXXXX : l'agent reprend
@@ -99,16 +101,30 @@ export async function handleOwnerCommand(env, text, request) {
       const r = await createPayment(env, request, { amount, label: pLabel, wa, name, project });
       if (!r.ok) return r.error;
       const link = payLink(env, r.pay.ref);
+      if (r.pay.mode === "manual") {
+        let sentM = await sendText(env, wa, manualMessage(env, r.pay));
+        if (isWindowError(sentM) && env.TEMPLATE_PAYMENT_LINK) sentM = await sendTemplate(env, wa, env.TEMPLATE_PAYMENT_LINK, [name || "", fmtFcfa(amount), link]);
+        return `${r.pay.ref} créé : ${fmtFcfa(amount)} pour ${pLabel} (paiement par Mobile Money).\n` + (sentM.ok ? "Instructions envoyées au client. Quand il annonce avoir payé, vous recevez une alerte : vérifiez dans votre application puis /confirme " + r.pay.ref + "." : "Le client n'a pas pu être prévenu (plus de 24 h sans message) : transmettez-lui ce lien : " + link);
+      }
       const msg = `Bonjour${name ? " " + name : ""}, voici votre lien de paiement sécurisé pour ${pLabel} : ${fmtFcfa(amount)}.\n${link}\nVous pouvez payer avec Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire.`;
       let sent = await sendText(env, wa, msg);
       if (isWindowError(sent) && env.TEMPLATE_PAYMENT_LINK) sent = await sendTemplate(env, wa, env.TEMPLATE_PAYMENT_LINK, [name || "", fmtFcfa(amount), link]);
       return `${r.pay.ref} créé : ${fmtFcfa(amount)} pour ${pLabel}.\nLien : ${link}\n` + (sent.ok ? "Envoyé au client." : "Le client n'a pas pu être prévenu (plus de 24 h sans message) : transmettez-lui le lien vous-même.");
     }
 
+    case "/confirme":
+    case "/annule": {
+      const ref = arg.split(/\s+/)[0];
+      if (!ref) return `Exemple : ${cmd} KP2ABC3DEF`;
+      const r = cmd === "/confirme" ? await confirmPayment(env, ref) : await cancelPayment(env, ref);
+      if (!r.ok) return r.error;
+      return cmd === "/confirme" ? `${r.pay.ref} confirmé : ${fmtFcfa(r.pay.amount)} reçu. Le client est remercié.` : `${r.pay.ref} refusé. Le client peut en refaire un avec /paiement.`;
+    }
+
     case "/paiements": {
       const ps = await listPayments(env, 10);
       if (!ps.length) return "Aucun paiement pour l'instant.";
-      const st = { pending: "en attente", paid: "payé", failed: "échoué" };
+      const st = { pending: "en attente", declared: "annoncé : à vérifier", paid: "payé", failed: "échoué" };
       return ps.map((p) => `${p.ref} — ${fmtFcfa(p.amount)} — ${p.label} — ${st[p.status] || p.status}`).join("\n");
     }
 
