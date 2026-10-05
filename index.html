@@ -49,11 +49,13 @@ ul,ol{padding:0;list-style:none}
 .logo .mark{width:30px;height:30px;display:block}
 .logo .wm{font-size:1.45rem;letter-spacing:-.04em;line-height:1}
 .logo .wm b{font-weight:800;color:var(--rec)}
+.chap{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);margin-right:14px}
+.right{display:flex;align-items:center}
 .tc{font-family:var(--f-mono);font-size:.8rem;font-variant-numeric:tabular-nums;color:var(--muted)}
 .nav ul{display:flex;gap:28px;font-family:var(--f-display);font-weight:500;font-size:.95rem}
 .nav ul a{text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
 .nav ul a:hover{border-color:var(--rec)}
-@media(max-width:760px){.nav ul,.tc{display:none}}
+@media(max-width:760px){.nav ul,.tc,.chap{display:none}}
 
 /* HERO */
 .hero{padding:clamp(48px,9vw,110px) 0 0}
@@ -92,8 +94,9 @@ h1 em{font-family:var(--f-serif);font-style:italic;font-weight:400;letter-spacin
 .t3 .clip:nth-child(1){transition-delay:.9s}.t3 .clip:nth-child(2){transition-delay:1.1s}
 .cursor{position:absolute;top:0;bottom:0;left:44px;width:2px;background:var(--rec);transform:translateX(0);z-index:2}
 .cursor::before{content:"";position:absolute;top:-1px;left:-6px;border:7px solid transparent;border-top-color:var(--rec);border-bottom:0}
-.ready .cursor{animation:sweep 3.2s 1.2s var(--ease) forwards}
-@keyframes sweep{to{transform:translateX(calc(var(--lane,1000px)))}}
+.clip{filter:saturate(.5);opacity:.4}
+.clip.passed{filter:none;opacity:1}
+.ready .clip{transition:transform 1s var(--ease),opacity .35s,filter .35s}
 @media(max-width:640px){.clip{font-size:.7rem;padding:0 7px}}
 
 /* Sections */
@@ -163,6 +166,7 @@ footer a{text-underline-offset:3px}
   *,*::before,*::after{animation:none!important;transition:none!important}
   h1 .w>span,.clip,.clip span,.rv{transform:none!important;opacity:1!important}
   .cursor{display:none}
+  .clip{opacity:1!important;filter:none!important}
   .playhead{display:none}
 }
 </style>
@@ -180,7 +184,7 @@ footer a{text-underline-offset:3px}
       <li><a href="#apropos">À propos</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <span class="tc" id="tc" aria-hidden="true">00:00:00:00</span>
+    <div class="right" aria-hidden="true"><span class="chap" id="chap">Accueil</span><span class="tc" id="tc">00:00:00:00</span></div>
   </div>
 </header>
 
@@ -320,15 +324,33 @@ footer a{text-underline-offset:3px}
 
   // Tête de lecture + timecode (25 i/s) liés au scroll
   var bar=document.getElementById('playhead'), tc=document.getElementById('tc'), tick=false;
+  var cursor=document.getElementById('cursor'), tl=document.getElementById('timeline'), clips=[].slice.call(document.querySelectorAll('.clip'));
   function pad(n){return (n<10?'0':'')+n}
   function update(){
     var max=document.documentElement.scrollHeight-innerHeight, p=max>0?Math.min(1,scrollY/max):0;
     bar.style.transform='scaleX('+p+')';
     var frames=Math.round(p*180*25); // 3 min de « film »
     tc.textContent=pad(Math.floor(frames/90000))+':'+pad(Math.floor(frames/1500)%60)+':'+pad(Math.floor(frames/25)%60)+':'+pad(frames%25);
+    // La tête de lecture de la timeline avance avec le scroll du hero
+    var lane=document.querySelector('.lane'), lw=lane.offsetWidth, span=Math.max(1,tl.offsetTop-64);
+    var hp=Math.min(1,scrollY/span), x=hp*lw;
+    cursor.style.transform='translateX('+x+'px)';
+    var base=lane.getBoundingClientRect().left;
+    clips.forEach(function(c){var r=c.getBoundingClientRect(); c.classList.toggle('passed',(r.left-base)<=x)});
     tick=false;
   }
   addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(update)}},{passive:true});
+  addEventListener('resize',update);
+
+  // Chapitre courant dans la barre de navigation
+  var chap=document.getElementById('chap');
+  var names={top:'Accueil',services:'Services',demarche:'Démarche',realisations:'Réalisations',apropos:'À propos',contact:'Contact'};
+  if('IntersectionObserver' in window){
+    var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting) chap.textContent=names[e.target.id]||''})},{rootMargin:'-45% 0px -50% 0px'});
+    ['services','demarche','realisations','apropos','contact'].forEach(function(id){so.observe(document.getElementById(id))});
+    var hero=document.querySelector('.hero'); hero.id='hero';
+    new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting) chap.textContent='Accueil'})},{rootMargin:'-45% 0px -50% 0px'}).observe(hero);
+  }
   update();
 })();
 </script>
