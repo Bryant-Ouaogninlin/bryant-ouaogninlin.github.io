@@ -261,5 +261,5 @@
     return true;
   }
   function skipIntro(){root.classList.remove('intro-on');intro.style.display='none';begin()}
-  import('./assets/vendor/three.module.min.js').then(function(T){ if(!runIntro(T)) skipIntro() }).catch(skipIntro);
+  import('./vendor/three.module.min.js').then(function(T){ if(!runIntro(T)) skipIntro() }).catch(skipIntro);
 })();
