@@ -11,7 +11,7 @@ EFFORT = "medium"           # low | medium | high : plus c'est bas, plus c'est r
 # Mémoire de l'agent (conversations, demandes, projets). À créer : voir README, étape 3.
 [[kv_namespaces]]
 binding = "KV"
-id = "REMPLACER_PAR_L_ID_DU_KV"
+id = "9f76db02413741f0a0b48d2b9c4b2a50"
 
 # Secrets à ajouter dans Cloudflare (jamais dans ce fichier) :
 #   ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_PHONE_ID,
