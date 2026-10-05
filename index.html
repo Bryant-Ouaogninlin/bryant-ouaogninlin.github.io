@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/site.css?v=27">
-<link rel="stylesheet" href="assets/film.css?v=3">
+<link rel="stylesheet" href="assets/film.css?v=9">
 </head>
 <body>
 <div id="intro">
@@ -44,7 +44,7 @@
     <div class="cta">
       <a class="btn solid" href="contact.html">Parler de mon projet</a>
       <a class="btn line" href="services.html">Voir ce que nous faisons</a>
-      <a class="btn line" href="#film">Voir comment ça marche</a>
+      <a class="film-link mono" href="#film">▶ Voir le film · 40 s</a>
     </div>
       <div class="hero3d" id="hero3d" aria-hidden="true"><svg class="kfb" viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="5" width="7" height="30" fill="#f2f1ec"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="#ff5a1f"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="#f2f1ec"/></svg><canvas></canvas>
         <div class="hud"><span class="tl">Obj · K-01</span><span class="tr">● Rec</span><span class="bl">Kinéo / Marque</span><span class="br" id="hudrot">ROT 000°</span></div>
@@ -79,23 +79,17 @@
   <div class="wrap">
     <div class="head rv"><p class="mono" data-scramble>01 — Comment ça marche</p><h2 data-scramble>De votre message au site en ligne.</h2></div>
     <div class="player rv" id="player">
-      <div class="f-stage">
-        <div class="f-cap" aria-live="off"><span class="cn mono" id="fcn">01 / 05</span><h3 id="fct">Vous nous écrivez</h3><p id="fcp"></p></div>
-        <div class="f-vis"><div class="f-in" aria-hidden="true"></div><span class="f-tag mono">Exemple · mise en situation</span></div>
+      <div class="f-vis">
+        <div class="f-in" aria-hidden="true"></div>
+        <span class="f-tag">Exemple de mise en situation</span>
+        <div class="f-end"><a class="btn solid" href="contact.html">Parler de mon projet</a><button class="btn line" id="freplay" type="button">Revoir le film</button></div>
       </div>
-      <div class="f-end">
-        <div>
-          <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="5" width="7" height="30" fill="#f2f1ec"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="var(--rec)"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="#f2f1ec"/></svg>
-          <h3>Un projet ? Parlons-en.</h3>
-          <p>Même méthode pour le montage vidéo et pour le digital.</p>
-          <div class="cta"><a class="btn solid" href="contact.html">Parler de mon projet</a><button class="btn line" id="freplay" type="button">Revoir le film</button></div>
-        </div>
-      </div>
+      <div class="f-sr" aria-live="off"><h3 id="fct">Vous nous écrivez</h3><p id="fcp"></p></div>
       <div class="f-ctrl">
         <button class="f-pp" id="fpp" type="button" aria-label="Lire"><svg class="pl" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5l11 6.5-11 6.5z" fill="currentColor"/></svg><svg class="pa" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z" fill="currentColor"/></svg></button>
         <button class="f-snd" id="fsnd" type="button" aria-pressed="false" aria-label="Activer le son"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3.5L11 4.5v11L6.5 12H3z" fill="currentColor"/><path class="w" d="M13.5 7.5a4 4 0 010 5M15.5 5.5a7 7 0 010 9" fill="none" stroke="currentColor" stroke-width="1.6"/><path class="x" d="M13 7.5l5 5M18 7.5l-5 5" stroke="currentColor" stroke-width="1.6"/></svg><span class="mono">Son</span></button>
         <ol class="f-clips" id="fclips" aria-label="Chapitres"></ol>
-        <span class="f-tc" id="ftc">00:00 / 00:38</span>
+        <span class="f-tc" id="ftc">00:00 / 00:59</span>
       </div>
     </div>
   </div>
@@ -126,6 +120,6 @@
 <script src="assets/intro.js?v=26"></script>
 <script src="assets/theme.js?v=26"></script>
 <script src="assets/hero3d.js?v=26"></script>
-<script src="assets/film.js?v=3"></script>
+<script src="assets/film.js?v=9"></script>
 </body>
 </html>
