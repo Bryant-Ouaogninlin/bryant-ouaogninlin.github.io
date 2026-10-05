@@ -2,6 +2,7 @@ name = "kineo-agent"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true          # adresse publique kineo-agent.kineo-digi.workers.dev
 
 # Réglages non secrets (modifiables ici ou dans le tableau de bord Cloudflare)
 [vars]
