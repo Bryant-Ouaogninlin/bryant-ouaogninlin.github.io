@@ -5,6 +5,7 @@ import { sendText } from "./whatsapp.js";
 import { getConv, isHuman, saveConv } from "./store.js";
 import { notifyOwner } from "./notify.js";
 import { TOOLS, runTool } from "./tools.js";
+import { handleMenuMessage } from "./menu.js";
 
 const MAX_STEPS = 6; // un message client ne peut pas déclencher plus de 6 allers-retours avec Claude
 
@@ -30,6 +31,9 @@ export async function handleClientMessage(env, msg) {
     await notifyOwner(env, `Message de ${conv.name || "client"} (+${msg.from}) :\n${text}\n\nRépondre : /dire ${msg.from} votre message`);
     return;
   }
+
+  // Pas de clé Anthropic (ou mode forcé) : menu automatique, sans IA et sans coût.
+  if (!env.ANTHROPIC_API_KEY || env.AGENT_MODE === "menu") return handleMenuMessage(env, { ...msg, text }, conv);
 
   const client = makeClient(env);
   const ctx = { wa: msg.from, name: conv.name, handedOff: false };

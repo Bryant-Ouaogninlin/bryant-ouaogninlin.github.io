@@ -368,5 +368,34 @@ console.log("\n7. Paiement manuel : Mobile Money et virement bancaire (sans Cine
   ok(txt.includes("Aucun moyen de paiement manuel"), "sans aucun numéro configuré, vous recevez un message d'aide plutôt qu'une erreur");
 }
 
+console.log("\n8. Mode menu : sans clé Anthropic, gratuit");
+{
+  const C = "2250505000042";
+  const w = makeWorld([]); const env = { ...mkEnv(w), ANTHROPIC_API_KEY: undefined };
+  const say1 = async (txt) => { await post(env, webhook(C, txt, { name: "Awa" })); return textsTo(w, C).at(-1); };
+  let r = await say1("Bonjour");
+  ok(r.includes("Awa") && r.includes("1. Un site web") && w.anthropic.length === 0, "bonjour affiche le menu, sans appeler Claude");
+  r = await say1("1");
+  ok(r.includes("Décrivez"), "choix 1 : demande la description");
+  r = await say1("Un site pour mon salon de coiffure");
+  ok(r.includes("Pour quand"), "puis demande le délai");
+  ok(textsTo(w, OWNER).some((m) => m.includes("Nouvelle demande") && m.includes("salon")), "le propriétaire est prévenu dès la description");
+  r = await say1("fin novembre");
+  ok(r.includes("transmise") && JSON.parse(await env.KV.get(`lead:${C}`)).deadline === "fin novembre", "la demande est complétée avec le délai");
+  r = await say1("4");
+  ok(r.includes("aucun projet"), "suivi sans projet : réponse honnête");
+  r = await say1("5");
+  r = await say1("demain après 17h");
+  ok(textsTo(w, OWNER).some((m) => m.includes("rappel") && m.includes("17h")), "demande de rappel transmise");
+  r = await say1("n'importe quoi");
+  ok(r.includes("Je n'ai pas compris") && r.includes("6. Parler à l'équipe"), "texte libre hors menu : on remontre le menu");
+  r = await say1("6");
+  ok(r.includes("L'équipe est prévenue") && (await env.KV.get(`human:${C}`)) === "1", "choix 6 : passage de relais");
+  const before = w.sent.length;
+  await say1("1");
+  ok(w.sent.filter((m) => m.to === C).length === textsTo(w, C).length && w.sent.length === before + 1, "après le relais, l'agent se tait (message transmis à l'équipe)");
+  ok(w.anthropic.length === 0, "aucun appel à Claude pendant tout le test");
+}
+
 console.log(`\n${passed} réussis, ${failed} échoués`);
 process.exit(failed ? 1 : 0);
