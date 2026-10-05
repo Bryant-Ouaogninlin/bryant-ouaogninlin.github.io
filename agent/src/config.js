@@ -6,6 +6,7 @@ export const FACTS = {
   site: "https://bryant-ouaogninlin.github.io/",
   email: "kineo.digi@gmail.com",
   tiktok: "https://www.tiktok.com/@cherklaw",
+  instagram: "https://www.instagram.com/kineo.digital",
   services: [
     {
       code: "site",
