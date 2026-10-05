@@ -204,3 +204,13 @@ footer a{text-underline-offset:3px}
 .soc a{color:inherit;text-decoration:none}
 .soc a:hover{background:#0e1114;color:#f2f1ec}
 footer .wrap{align-items:center}
+
+/* cartes de réalisations */
+.card{margin:0}
+.card .frame{display:block;padding:0}
+.card .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.card .frame::before,.card .frame::after{z-index:1}
+.card figcaption{padding-top:18px}
+.card figcaption .mono{color:var(--rec);display:block;margin-bottom:6px}
+.card figcaption b{font-family:var(--f-display);font-size:1.3rem;letter-spacing:-.02em;display:block}
+.card figcaption p{color:var(--ink-2);font-size:1.02rem;margin-top:6px}
