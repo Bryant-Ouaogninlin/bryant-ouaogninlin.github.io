@@ -4,9 +4,10 @@ import { handleClientMessage } from "./agent.js";
 import { handleOwnerCommand } from "./owner.js";
 import { rateLimited, seenBefore } from "./store.js";
 import { markRead, parseIncoming, sendText, verifySignature } from "./whatsapp.js";
-import { notifyOwner } from "./tools.js";
+import { notifyOwner } from "./notify.js";
+import { handlePayRoute } from "./pay.js";
 
-export async function processMessage(env, msg) {
+export async function processMessage(env, msg, request) {
   if (await seenBefore(env, msg.id)) return; // Meta renvoie parfois le même message : on ne répond qu'une fois
   await markRead(env, msg.id); // les deux coches bleues
 
@@ -14,7 +15,7 @@ export async function processMessage(env, msg) {
 
   try {
     if (isOwner && msg.text?.startsWith("/")) {
-      await sendText(env, msg.from, await handleOwnerCommand(env, msg.text));
+      await sendText(env, msg.from, await handleOwnerCommand(env, msg.text, request));
       return;
     }
     if (msg.text == null || msg.text === "") {
@@ -44,7 +45,7 @@ async function receive(request, env, ctx) {
   try { body = JSON.parse(raw); } catch { return new Response("JSON invalide", { status: 400 }); }
 
   // On répond 200 tout de suite à Meta (sinon il renvoie le message) et on travaille en arrière-plan.
-  const work = parseIncoming(body).map((m) => processMessage(env, m));
+  const work = parseIncoming(body).map((m) => processMessage(env, m, request));
   ctx.waitUntil(Promise.allSettled(work));
   return new Response("ok");
 }
@@ -53,6 +54,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === "/health") return new Response("ok");
+    if (url.pathname.startsWith("/pay/")) {
+      const r = await handlePayRoute(request, env, ctx, url);
+      if (r) return r;
+    }
     if (url.pathname === "/webhook") {
       if (request.method === "GET") {
         // Poignée de main de configuration demandée par Meta

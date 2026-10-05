@@ -105,6 +105,37 @@ Seul `OWNER_NUMBER` peut utiliser ces commandes :
 
 Étapes : `discussion`, `proposition`, `ajustements`, `livraison`, `termine`.
 
+## Paiements (CinetPay)
+
+Les clients paient sur la page sécurisée de **CinetPay** (Wave, Orange Money, MTN MoMo, Moov Money, cartes Visa/Mastercard selon disponibilité).
+Kinéo ne voit jamais de numéro de carte ni de code secret. Commission annoncée par CinetPay : de l'ordre de 1,5 à 2 % selon l'offre
+(à vérifier dans votre contrat). Le franc CFA (XOF) est la devise ; **le montant doit être un multiple de 5**.
+
+**Comment ça se passe**
+1. Vous écrivez à l'agent : `/paiement K-001 50000 | acompte`. L'agent crée le lien chez CinetPay et l'envoie au client par WhatsApp.
+2. Le client ouvre la page `paiement.html` du site, clique *Payer maintenant*, choisit son moyen de paiement chez CinetPay.
+3. CinetPay prévient le Worker (`/pay/notify`). **Le Worker ne croit pas cet appel** : il redemande le statut à CinetPay, et vérifie le montant
+   et la devise. Seulement alors, le paiement est marqué *payé*, vous êtes prévenu et le client reçoit un accusé de réception.
+4. La page du site se met à jour toute seule (le lapin fête ça).
+
+**Commandes** : `/paiement K-001 50000 | acompte`, `/paiement 2250505483481 25000 | retouches` (sans projet), `/paiements`
+(liste), `/paye K-001 10000 | espèces` (paiement reçu hors ligne). L'agent peut renvoyer un lien en attente quand le client le demande.
+
+**Mise en route**
+1. Créez un compte marchand sur **cinetpay.com** et faites valider votre activité (pièces d'identité ; selon votre statut, des documents d'entreprise).
+2. Dans votre espace marchand, récupérez la **clé API** et le **Site ID**.
+3. Ajoutez-les comme secrets Cloudflare : `CINETPAY_API_KEY` et `CINETPAY_SITE_ID`.
+4. Activez la page de paiement du site : dans `assets/config.js`, mettez l'adresse du Worker (`window.KINEO = { api: "https://kineo-agent.….workers.dev" }`).
+5. Faites un premier paiement test d'un petit montant (par exemple 100 FCFA) avant d'ouvrir au public.
+
+Variables facultatives : `SITE_URL` (adresse du site, par défaut celle de GitHub Pages), `WORKER_URL` (adresse du Worker, sinon déduite de la requête),
+`CONTACT_EMAIL`. Modèles WhatsApp facultatifs pour écrire hors fenêtre de 24 h : `TEMPLATE_PAYMENT_LINK` (3 variables : prénom, montant, lien) et
+`TEMPLATE_PAYMENT_OK` (3 variables : prénom, montant, référence).
+
+**Sécurité des paiements** : la notification n'est jamais crue sans vérification auprès de CinetPay ; un paiement dont le montant ne correspond
+pas est refusé et vous êtes alerté ; une notification en double ne fait rien de plus ; le statut public d'un paiement ne contient aucune donnée
+personnelle et n'est lisible que depuis le site (CORS) avec une référence longue et aléatoire ; seul le propriétaire peut créer un lien.
+
 ## Limites à connaître
 
 - **La fenêtre de 24 h.** WhatsApp n'autorise les messages libres que dans les 24 h suivant un message du client. Au-delà
@@ -113,7 +144,7 @@ Seul `OWNER_NUMBER` peut utiliser ces commandes :
   Sans cela, une alerte hors fenêtre n'arrive pas : écrivez simplement `/aide` à l'agent chaque jour pour la rouvrir.
 - **Messages vocaux, images** : pour l'instant l'agent ne lit que le texte et le dit poliment.
 - **Pas d'agenda** : il note les demandes de rappel, vous confirmez.
-- **Pas de paiement, pas de prix** : tout passe par vous.
+- **Pas de prix, pas de lien de paiement créé par l'agent** : l'agent peut seulement renvoyer un lien que vous avez émis. Tout le reste passe par vous.
 
 ## Sécurité et données personnelles
 
@@ -138,4 +169,4 @@ npm install
 npm test
 ```
 
-32 contrôles simulent Meta et Claude : signature, doublons, mémoire, suivi de projet, passage de relais, pannes, anti-abus.
+55 contrôles simulent Meta, Claude et CinetPay : signature, doublons, mémoire, suivi de projet, passage de relais, pannes, anti-abus, paiements (vérification, montants, doublons).

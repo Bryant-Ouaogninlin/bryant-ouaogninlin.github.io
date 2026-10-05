@@ -324,3 +324,33 @@ footer .wrap{align-items:center}
 .err .lead{margin-top:24px}
 @media(max-width:900px){.err-grid{grid-template-columns:1fr}}
 .soc li:has(a){border-style:solid;padding:0}.soc li a{display:block;padding:8px 12px}
+
+/* page de paiement */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pay{max-width:640px}
+.pay-card{border:1px solid var(--ink);padding:clamp(22px,4vw,38px);background:linear-gradient(165deg,var(--stage) 0%,var(--paper) 80%)}
+.pay-card[hidden]{display:none}
+.pay-card .mono{color:var(--rec);display:block;margin-bottom:12px}
+.pay-card h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3vw,2.1rem);letter-spacing:-.02em;line-height:1.1;margin-bottom:12px}
+.pay-card p{color:var(--ink-2)}
+.pay-card .btn{margin-top:22px}
+.pay-label{font-size:1.15rem}
+.pay-amount{font-family:var(--f-display);font-weight:800;font-size:clamp(2.2rem,7vw,3.6rem);letter-spacing:-.03em;color:var(--ink)!important;margin-top:6px}
+.pay-note{font-size:.95rem;margin-top:16px;color:var(--muted)!important}
+.pay-card .pay-ref{margin:20px 0 0;color:var(--muted);font-size:.7rem}
+.pay-ok .scene{margin:0 0 22px}
+.pay-form{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.pay-form input{flex:1 1 200px;min-width:0;font-family:var(--f-mono);font-size:1rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 16px;background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
+.pay-form input:focus{outline:2px solid var(--rec);outline-offset:2px}
+.pay-form .btn{margin-top:0}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,3vw,40px);margin-top:10px}
+.steps3 li{border-top:2px solid var(--ink);padding-top:16px}
+.steps3 .mono{color:var(--rec);display:block;margin-bottom:8px}
+.steps3 b{font-family:var(--f-display);font-size:1.25rem;display:block;margin-bottom:6px}
+.steps3 p{color:var(--ink-2);font-size:1.02rem}
+@media(max-width:820px){.steps3{grid-template-columns:1fr}}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,6vw,80px)}
+@media(max-width:820px){.sec-grid{grid-template-columns:1fr}}
+.methods{display:flex;flex-wrap:wrap;gap:10px}
+.methods li{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--ink);padding:10px 14px}
+.big2{font-size:1.3rem;line-height:1.4}

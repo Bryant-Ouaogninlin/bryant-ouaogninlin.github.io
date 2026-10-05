@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paiement — Kinéo</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Payer votre prestation Kinéo en toute sécurité : Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire.">
+<script>try{var _t=JSON.parse(localStorage.getItem("kineoTheme")||"null");if(_t){var _r=document.documentElement.style;_r.setProperty("--rec",_t.rec);_r.setProperty("--rec-dark",_t.dark);_r.setProperty("--stage",_t.stage)}}catch(e){}</script>
+<link rel="icon" type="image/svg+xml" href="assets/kineo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css?v=26">
+</head>
+<body>
+<div class="playhead" id="playhead" aria-hidden="true"></div>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="Kinéo, accueil"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="5" width="7" height="30" fill="currentColor"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="var(--rec)"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="currentColor"/></svg><span class="wm">kin<b>é</b>o</span></a>
+    <ul id="menu"><li><a href="index.html">Accueil</a></li><li><a href="services.html">Services</a></li><li><a href="a-propos.html">À propos</a></li><li><a href="contact.html">Contact</a></li></ul>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+    <div class="right" aria-hidden="true"><span class="chap" id="chap">Paiement</span><span class="tc" id="tc">00:00:00:00</span></div>
+  </div>
+</header>
+<main>
+<section class="phero"><div class="wrap">
+  <span class="mono" data-scramble>Paiement</span>
+  <h1><span class="w"><span>Payer</span></span> <span class="w"><span>en</span></span> <span class="w"><span>toute</span></span> <span class="w"><span><em>sécurité.</em></span></span></h1>
+  <p class="lead">Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire : vous choisissez sur la page sécurisée, selon ce qui est disponible pour vous.</p>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+  <!-- Panneau rempli par assets/pay.js -->
+  <div class="pay" id="pay" aria-live="polite">
+    <div class="pay-card" id="pay-closed" hidden>
+      <span class="mono">Bientôt</span>
+      <h2>Le paiement en ligne ouvre très bientôt.</h2>
+      <p>En attendant, écrivez-nous : nous vous indiquerons comment régler votre devis.</p>
+      <a class="btn solid" href="contact.html">Nous contacter</a>
+    </div>
+
+    <div class="pay-card" id="pay-ask" hidden>
+      <span class="mono">Votre référence</span>
+      <h2>Vous avez reçu une référence de paiement ?</h2>
+      <p>Elle commence par <b>KP</b> et vous a été envoyée avec votre lien. Saisissez-la pour voir votre paiement.</p>
+      <form id="pay-form" class="pay-form" autocomplete="off">
+        <label class="sr" for="pay-ref">Référence de paiement</label>
+        <input id="pay-ref" name="ref" type="text" inputmode="text" maxlength="32" placeholder="KP2ABC3DEF" pattern="[A-Za-z0-9]{6,32}" required>
+        <button class="btn solid" type="submit">Voir mon paiement</button>
+      </form>
+    </div>
+
+    <div class="pay-card" id="pay-load" hidden><span class="mono">Un instant…</span><p>Nous récupérons votre paiement.</p></div>
+
+    <div class="pay-card" id="pay-pending" hidden>
+      <span class="mono">En attente de paiement</span>
+      <p class="pay-label" data-f="label"></p>
+      <p class="pay-amount" data-f="amount"></p>
+      <a class="btn solid" id="pay-go" href="#" rel="noopener">Payer maintenant</a>
+      <p class="pay-note">Vous serez redirigé vers la page sécurisée de CinetPay. Votre paiement est confirmé ici automatiquement.</p>
+      <p class="mono pay-ref">Réf. <span data-f="ref"></span></p>
+    </div>
+
+    <div class="pay-card pay-ok" id="pay-paid" hidden>
+      <div class="scene wide" id="pay-win"></div>
+      <span class="mono">Paiement reçu</span>
+      <h2>Merci, c'est bien reçu.</h2>
+      <p class="pay-label" data-f="label"></p>
+      <p class="pay-amount" data-f="amount"></p>
+      <p class="mono pay-ref">Réf. <span data-f="ref"></span> · <span data-f="date"></span></p>
+    </div>
+
+    <div class="pay-card" id="pay-failed" hidden>
+      <span class="mono">Paiement non abouti</span>
+      <h2>Le paiement n'a pas pu aller au bout.</h2>
+      <p>Aucun montant n'a été validé. Écrivez-nous : nous vous enverrons un nouveau lien.</p>
+      <a class="btn solid" href="contact.html">Nous contacter</a>
+      <p class="mono pay-ref">Réf. <span data-f="ref"></span></p>
+    </div>
+
+    <div class="pay-card" id="pay-unknown" hidden>
+      <span class="mono">Référence introuvable</span>
+      <h2>Nous ne trouvons pas ce paiement.</h2>
+      <p>Vérifiez la référence ou écrivez-nous.</p>
+      <a class="btn line" href="paiement.html">Saisir une autre référence</a>
+    </div>
+  </div>
+</div></section>
+
+<section style="background:var(--paper-2);border-block:1px solid var(--ink)"><div class="wrap">
+  <div class="head rv"><p class="mono" data-scramble>Comment ça marche</p><h2 data-scramble>Trois étapes, aucune surprise.</h2></div>
+  <ol class="steps3">
+    <li class="rv"><span class="mono">01</span><b>Vous validez le devis</b><p>Le montant et les modalités (acompte, solde) sont fixés dans votre devis, jamais autrement.</p></li>
+    <li class="rv" style="transition-delay:.1s"><span class="mono">02</span><b>Vous recevez un lien</b><p>Un lien de paiement personnel vous est envoyé par WhatsApp. Il ne sert que pour ce paiement.</p></li>
+    <li class="rv" style="transition-delay:.2s"><span class="mono">03</span><b>Vous payez, c'est confirmé</b><p>Vous choisissez votre moyen de paiement, et la confirmation s'affiche ici et sur WhatsApp.</p></li>
+  </ol>
+</div></section>
+
+<section><div class="wrap sec-grid">
+  <div class="rv">
+    <p class="mono" style="color:var(--rec);margin-bottom:14px">Moyens de paiement</p>
+    <ul class="methods"><li>Wave</li><li>Orange Money</li><li>MTN MoMo</li><li>Moov Money</li><li>Carte Visa / Mastercard</li></ul>
+    <p class="pay-note">Les moyens proposés s'affichent sur la page de paiement et peuvent varier selon votre opérateur. Les montants sont en francs CFA (FCFA).</p>
+  </div>
+  <div class="rv">
+    <p class="mono" style="color:var(--rec);margin-bottom:14px">Votre sécurité</p>
+    <p class="big2">Kinéo ne voit et ne conserve jamais votre numéro de carte, votre code secret ni votre code reçu par SMS.</p>
+    <p class="pay-note">Le paiement se fait sur la page sécurisée de notre prestataire, CinetPay. Ne communiquez jamais ces informations par message, même à quelqu'un qui dit venir de chez nous.</p>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <h2 class="rv" data-scramble>Une question sur un paiement ?</h2>
+  <a class="btn solid rv" href="contact.html">Nous contacter</a>
+</div></section>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Kinéo · <a href="mailto:kineo.digi@gmail.com">kineo.digi@gmail.com</a></span>
+    <span><a href="https://wa.me/2250105483481?text=Bonjour%20Kin%C3%A9o%2C%20j%27ai%20un%20projet." target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.tiktok.com/@cherklaw" target="_blank" rel="noopener">TikTok</a> · <a href="legal.html">Mentions légales &amp; confidentialité</a></span>
+  </div>
+</footer>
+<script src="assets/config.js?v=1"></script>
+<script src="assets/site.js?v=26"></script>
+<script src="assets/fx.js?v=26"></script>
+<script src="assets/pay.js?v=1"></script>
+<script type="module" src="assets/scenes.js?v=26"></script>
+</body>
+</html>
