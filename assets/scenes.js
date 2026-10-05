@@ -28,7 +28,7 @@ function makeStage(canvas){
   var rim=new THREE.DirectionalLight(0xff5a1f,3); rim.position.set(300,120,-250); scene.add(rim);
   function size(){var w=canvas.clientWidth,h=canvas.clientHeight; if(!w||!h) return; renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75)); renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix()}
   size(); if('ResizeObserver' in window) new ResizeObserver(size).observe(canvas); else addEventListener('resize',size);
-  function tint(){S_edges.forEach(function(e){e.material.color.copy(accent);e.material.emissive.copy(accent)}); rim.color.copy(accent); sbA.material.color.copy(accent).multiplyScalar(5)}
+  function tint(){S_edges.forEach(function(e){e.material.color.copy(accent); if(e.material.emissive) e.material.emissive.copy(accent)}); rim.color.copy(accent); sbA.material.color.copy(accent).multiplyScalar(5)}
   tint(); document.addEventListener('kineo:theme',function(){tint(); var o=envTex; envTex=pm.fromScene(env,.03); scene.environment=envTex.texture; o.dispose()});
   // ombre
   var c=document.createElement('canvas'); c.width=c.height=128; var x=c.getContext('2d'), g=x.createRadialGradient(64,64,0,64,64,64);
@@ -193,21 +193,90 @@ function sceneDigital(S,canvas){
   };
 }
 
+// ---------- scène 404 : le lapin boxe un sac « 404 » ----------
+function sceneBoxing(S,canvas){
+  S.cam.position.set(10,108,430); S.cam.lookAt(10,98,0);
+  var gF=accM(), gB=accM(); var P_=S.bunny.parts; P_.gloveF.material=gF; P_.gloveB.material=gB; P_.gloveF.scale.multiplyScalar(1.35); P_.gloveB.scale.multiplyScalar(1.35);
+  S_edges.push({material:gF}); S_edges.push({material:gB});
+  var beam=new THREE.Mesh(new THREE.BoxGeometry(90,5,12),darkM); beam.position.set(30,206,0); S.scene.add(beam);
+  var pivot=new THREE.Group(); pivot.position.set(30,203,0); S.scene.add(pivot);
+  var chain=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,100,10),darkM); chain.position.y=-50; pivot.add(chain);
+  var tx=screenTex(256,512); tx.t.wrapS=THREE.RepeatWrapping; tx.t.offset.x=.5;
+  function paintBag(){var x=tx.x,A=accentCss(); x.fillStyle=A; x.fillRect(0,0,256,512); x.fillStyle='rgba(0,0,0,.18)'; x.fillRect(0,0,256,40); x.fillRect(0,472,256,40);
+    x.fillStyle='#f2f1ec'; x.font='800 120px monospace'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('404',128,256); x.font='500 20px monospace'; x.fillText('PAGE INTROUVABLE',128,340); tx.t.needsUpdate=true}
+  paintBag();
+  var bagMat=new THREE.MeshPhysicalMaterial({map:tx.t,roughness:.45,metalness:.05,clearcoat:.6,clearcoatRoughness:.3});
+  var bag=new THREE.Mesh(new THREE.CapsuleGeometry(16,50,8,28),bagMat); bag.position.y=-100-41; pivot.add(bag);
+  document.addEventListener('kineo:theme',paintBag);
+  // flash d'impact
+  var fc=document.createElement('canvas'); fc.width=fc.height=128; var fx=fc.getContext('2d'), fg=fx.createRadialGradient(64,64,0,64,64,64);
+  fg.addColorStop(0,'rgba(255,255,255,.95)'); fg.addColorStop(.35,'rgba(255,255,255,.5)'); fg.addColorStop(1,'rgba(255,255,255,0)'); fx.fillStyle=fg; fx.fillRect(0,0,128,128);
+  var flash=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(fc),transparent:true,depthWrite:false,toneMapped:false,opacity:0})); S.scene.add(flash);
+  var th=0, w=0, hitAt=-9, done={}, T=4.4;
+  var punches=[[.2,0,1],[.7,1,1],[1.2,0,1],[1.7,1,1],[2.7,0,2.4]]; // [temps, main(0=avant,1=arrière), force]
+  S.bunny.group.position.set(-14,0,6);
+  var phase=0, lastT=0;
+  return function(t,dt){
+    var lt=t%T, cyc=Math.floor(t/T);
+    var eF=0,eB=0,big=0;
+    punches.forEach(function(p,i){var u=(lt-p[0])/(p[2]>1?.5:.3); if(u<0||u>1) return; var e=u<.4?u/.4:1-(u-.4)/.6; e=Math.pow(e,1.4);
+      if(p[1]===0) eF=Math.max(eF,e); else eB=Math.max(eB,e); if(p[2]>1) big=Math.max(big,e);
+      var key=cyc+'_'+i; if(u>=.4&&!done[key]){done[key]=1; w+=.55*p[2]; hitAt=t; var ex=26-14+ -4; flash.position.set(14+big*2,66+(p[1]?-3:3),24); flash.userData.s=p[2]}});
+    // sac : pendule amorti
+    w+=(-10*th-1.1*w)*dt; th+=w*dt; pivot.rotation.z=th;
+    var fl=cl(1-(t-hitAt)/.28,0,1); flash.material.opacity=fl; flash.scale.setScalar(10+(1-fl)*22*(flash.userData.s||1));
+    // lapin : garde, jeu de jambes, coups
+    var bounce=Math.sin(t*9), celeb=lt>3.35&&lt<4.2, ce=eIO(cl((lt-3.35)/.2,0,1))*(1-eIO(cl((lt-4.0)/.2,0,1)));
+    var mvx=big*8; S.bunny.group.position.x=-14+mvx;
+    var dxm=mvx-lastT; lastT=mvx; phase+=Math.abs(dxm)*.4;
+    var P={yaw:-.5+ce*-.35,lean:.2+(eF+eB)*.1+big*.08-ce*.18,crouch:4+bounce*1.5-ce*3,h:ce*6*Math.abs(Math.sin(lt*14)),sq:-.02*bounce,blink:1-.92*tri(t%2.9,1.4,.07),
+      mouth:celeb?'joy':'strain',brow:celeb?-2.5:3.5,
+      footF:[16+eF*3,0],footB:[-13-eB*2,0],
+      handF:[lerp(lerp(12,32,eF),12,ce),lerp(lerp(-8+bounce*.6,-6,eF),-34,ce)],handB:[lerp(lerp(6,32,eB),0,ce),lerp(lerp(-4-bounce*.6,-4,eB),-38,ce)],
+      earA:-.6+(eF+eB)*.2+ce*.5,kick:0};
+    S.bunny.update(P,dt);
+    var o=S.bunny.group; S.shadow.scale.set(60,60,1); S.shadow.position.set(o.position.x+2,.5,o.position.z);
+  };
+}
+
+// ---------- scène À propos : le lapin dit bonjour ----------
+function sceneHello(S,canvas){
+  S.cam.position.set(0,98,520); S.cam.lookAt(0,92,0);
+  var ringA=new THREE.Mesh(new THREE.TorusGeometry(92,1.1,12,160),accM()); ringA.position.set(0,92,-50); S.scene.add(ringA); S_edges.push(ringA);
+  var ringB=new THREE.Mesh(new THREE.TorusGeometry(112,.6,10,160),new THREE.MeshBasicMaterial({color:0xf2f1ec,transparent:true,opacity:.2,toneMapped:false})); ringB.position.set(0,92,-60); S.scene.add(ringB);
+  var dots=[]; for(var i=0;i<3;i++){var d=new THREE.Mesh(new THREE.SphereGeometry(4,16,12),accM()); S.scene.add(d); dots.push(d); S_edges.push(d)}
+  S.bunny.group.position.set(0,0,0);
+  return function(t,dt){
+    var lt=t%5, wave=eIO(cl(lt/.4,0,1))*(1-eIO(cl((lt-3.4)/.4,0,1)));
+    var hop=lt>3.9&&lt<4.5?Math.sin(Math.PI*(lt-3.9)/.6):0;
+    var joy=wave>.5;
+    var P={yaw:-.85+Math.sin(t*.7)*.12,lean:.03,h:hop*12,sq:-.07*hop,crouch:hop?0:Math.sin(t*2)*.6,blink:1-.92*tri(t%3.2,1.7,.07),
+      mouth:joy||hop?'joy':'smile',brow:joy?-2.5:0,ha:Math.sin(t*1.3)*.05,hr:Math.sin(t*1.7)*.04,
+      footF:[10,0],footB:[-10,0],
+      handF:[lerp(4,14+Math.sin(t*10)*6,wave),lerp(22,-36+Math.abs(Math.sin(t*10))*-3,wave)],handB:[-4,24],elbowF:-1,
+      earA:-.2+Math.sin(t*2.4)*.08+hop*-.3,kick:0};
+    S.bunny.update(P,dt);
+    ringA.rotation.z=t*.25; ringB.rotation.z=-t*.15; ringB.rotation.x=.25;
+    dots.forEach(function(d,i){var a=t*.8+i*2.094; d.position.set(Math.cos(a)*92,92+Math.sin(a)*92,-50)});
+    var o=S.bunny.group; S.shadow.scale.set(70,70,1); S.shadow.position.set(0,.5,0);
+  };
+}
+
 // ---------- boucle commune ----------
-var builders={web:sceneWeb,video:sceneVideo,digital:sceneDigital};
+var builders={web:sceneWeb,video:sceneVideo,digital:sceneDigital,boxing:sceneBoxing,hello:sceneHello};
 document.querySelectorAll('canvas[data-scene]').forEach(function(cv){
   var b=builders[cv.getAttribute('data-scene')]; if(!b) return;
   var S=makeStage(cv); if(!S) return;
-  var anim=b(S,cv), vis=false, last=0, t=+(new URLSearchParams(location.search).get('t'))||0, raf=0;
+  var FREEZE=new URLSearchParams(location.search).has('freeze'), anim=b(S,cv), vis=false, last=0, t=+(new URLSearchParams(location.search).get('t'))||0, raf=0;
   function frame(now){
     raf=0; if(!vis||document.hidden) return;
     var dt=Math.min(.04,(now-last)/1000||.016); last=now; t+=dt;
     anim(t,dt); S.renderer.render(S.scene,S.cam);
     if(!reduce) raf=requestAnimationFrame(frame);
   }
-  function start(){ if(!raf){last=performance.now(); raf=requestAnimationFrame(frame)} }
+  function start(){ if(FREEZE) return; if(!raf){last=performance.now(); raf=requestAnimationFrame(frame)} }
   if('IntersectionObserver' in window) new IntersectionObserver(function(es){vis=es[0].isIntersecting; if(vis) start()},{threshold:.1}).observe(cv); else {vis=true;start()}
   document.addEventListener('visibilitychange',function(){if(!document.hidden&&vis)start()});
-  if(reduce){ vis=true; t=3.2; anim(t,.016); anim(t,.016); S.renderer.render(S.scene,S.cam) }
+  if(reduce||FREEZE){ vis=true; if(!t) t=3.2; for(var tt=0;tt<t;tt+=.02) anim(tt,.02); anim(t,.02); S.renderer.render(S.scene,S.cam) }
   cv.classList.add('live');
 });
