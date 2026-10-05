@@ -1,0 +1,19 @@
+VOIX DU FILM « COMMENT ÇA MARCHE »
+==================================
+
+Le film lit de vrais enregistrements (pas de voix de synthèse). Il y en a 6, un par chapitre.
+Déposez-les dans CE dossier, avec exactement ces noms :
+
+  voix-1.mp3   « Tout commence par un simple message. Dites-nous ce que vous voulez : un site, une vidéo, ou de l'aide en ligne. »
+  voix-2.mp3   « Ensuite, nous cadrons votre besoin : pour qui, pour quand, dans quel style. Quelques questions suffisent. »
+  voix-3.mp3   « Puis nous vous montrons une maquette. Vous voyez le projet avant qu'il soit terminé, pas après. »
+  voix-4.mp3   « Vous donnez vos retours, nous corrigeons. Autant de tours que nécessaire, jusqu'à ce que ce soit juste. »
+  voix-5.mp3   « Enfin, votre site est mis en ligne, et nous vous expliquons comment le prendre en main. »
+  voix-6.mp3   « Un projet ? Parlons-en. »
+
+Conseils d'enregistrement
+- Une pièce calme, le téléphone à 20 cm de la bouche, sans écho (près d'un lit ou d'un canapé).
+- Un ton posé et souriant, comme si vous parliez à un client. Refaites autant de prises que nécessaire.
+- Coupez les silences au début et à la fin ; exportez en MP3 (128 kb/s suffit).
+- Des phrases plus longues que prévu ne posent pas de problème : le chapitre s'allonge tout seul.
+- Le son d'ambiance (clics, bulles, musique douce) est créé par le site ; la voix se lit par-dessus.
