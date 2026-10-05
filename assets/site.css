@@ -354,3 +354,20 @@ footer .wrap{align-items:center}
 .methods{display:flex;flex-wrap:wrap;gap:10px}
 .methods li{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--ink);padding:10px 14px}
 .big2{font-size:1.3rem;line-height:1.4}
+
+/* paiement manuel */
+[data-only]{display:none}
+body[data-paymode="manual"] [data-only="manual"],body[data-paymode="cinetpay"] [data-only="cinetpay"]{display:revert}
+.pay-how{margin-top:18px;font-weight:500;color:var(--ink)!important}
+.ops{margin-top:10px;border-top:1px solid var(--line)}
+.ops li{display:grid;grid-template-columns:130px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.ops .op{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ops .num{font-family:var(--f-mono);font-size:1.02rem;word-break:break-all}
+.ops .copy{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--ink);border:1px solid var(--line);padding:7px 10px;cursor:pointer}
+.ops .copy:hover{border-color:var(--rec);color:var(--rec)}
+@media(max-width:560px){.ops li{grid-template-columns:1fr auto}.ops .op{grid-column:1/-1}}
+.pay-declare{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;padding-top:6px}
+.pay-declare .pay-how{flex:1 0 100%;margin:14px 0 2px}
+.pay-declare select,.pay-declare input{flex:1 1 180px;min-width:0;font-family:var(--f-body);font-size:1rem;padding:13px 14px;background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
+.pay-declare select:focus,.pay-declare input:focus{outline:2px solid var(--rec);outline-offset:2px}
+.pay-declare .btn{margin-top:0}
