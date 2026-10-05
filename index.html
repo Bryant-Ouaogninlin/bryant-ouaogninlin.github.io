@@ -159,7 +159,7 @@ section{padding:clamp(70px,10vw,130px) 0}
 
 /* À propos / contact */
 .about{display:grid;grid-template-columns:1fr 1.4fr;gap:clamp(30px,6vw,80px);align-items:start}
-.photo{aspect-ratio:4/5;border:2px solid var(--ink);display:grid;place-items:center;text-align:center;padding:20px;background:var(--paper-2);font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--rec)}
+.photo{color:#f2f1ec;aspect-ratio:4/5;border:2px solid var(--ink);display:grid;place-items:center;text-align:center;padding:20px;background:var(--paper-2);font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--rec)}
 .about p+p{margin-top:1em}
 .about p{font-size:1.25rem}
 @media(max-width:820px){.about{grid-template-columns:1fr}}
@@ -172,6 +172,9 @@ section{padding:clamp(70px,10vw,130px) 0}
 .contact .btn:hover{background:#0e1114;color:#f2f1ec}
 .todo{display:inline-block;background:var(--rec);color:#0e1114;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;padding:2px 8px;margin-left:8px;vertical-align:middle;text-transform:uppercase}
 
+.soc{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.soc li{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;border:1px dashed #0e1114;padding:8px 12px;color:#2a2f36}
+.soc small{margin-left:6px;color:#c2410c;font-size:.7rem}
 footer{padding:26px 0;border-top:1px solid var(--ink);font-size:.95rem}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer a{text-underline-offset:3px}
@@ -212,17 +215,17 @@ footer a{text-underline-offset:3px}
 <main id="top">
 <div class="hero">
   <div class="wrap">
-    <div class="kicker mono"><span class="rec">Disponible pour de nouveaux projets</span><span>À COMPLÉTER : ville / zone</span></div>
+    <div class="kicker mono"><span class="rec">Disponible pour de nouveaux projets</span><span>Sites · Montage · Digital</span></div>
     <h1 aria-label="Votre site, vos vidéos, votre présence en ligne.">
       <span class="w"><span>Votre</span></span> <span class="w"><span>site,</span></span>
       <span class="w"><span>vos</span></span> <span class="w"><span>vidéos,</span></span>
       <span class="w"><span><em>votre</em></span></span> <span class="w"><span>place</span></span>
       <span class="w"><span>en</span></span> <span class="w"><span>ligne.</span></span>
     </h1>
-    <p class="lead">Je crée des sites web pour les particuliers, je monte vos vidéos et je m'occupe de votre présence digitale. Un seul interlocuteur, du premier brouillon à la mise en ligne.</p>
+    <p class="lead">Nous créons des sites web pour les particuliers, nous montons vos vidéos et nous nous occupons de votre présence digitale. Une seule équipe, du premier brouillon à la mise en ligne.</p>
     <div class="cta">
       <a class="btn solid" href="#contact">Parler de mon projet</a>
-      <a class="btn line" href="#services">Voir ce que je fais</a>
+      <a class="btn line" href="#services">Voir ce que nous faisons</a>
     </div>
   </div>
 
@@ -275,8 +278,8 @@ footer a{text-underline-offset:3px}
     <div class="head rv"><p class="mono">02 — Démarche</p><h2>Du brouillon à la mise en ligne.</h2></div>
     <ol class="steps">
       <li class="step rv"><span class="mono">Étape 1</span><h3>On discute</h3><p>Vous me dites ce que vous voulez, pour qui, et pour quand.</p></li>
-      <li class="step rv" style="transition-delay:.1s"><span class="mono">Étape 2</span><h3>Je propose</h3><p>Une maquette ou un premier montage, pour valider la direction.</p></li>
-      <li class="step rv" style="transition-delay:.2s"><span class="mono">Étape 3</span><h3>On ajuste</h3><p>Vos retours, mes corrections, autant de tours que nécessaire. <span class="todo">À compléter</span></p></li>
+      <li class="step rv" style="transition-delay:.1s"><span class="mono">Étape 2</span><h3>On propose</h3><p>Une maquette ou un premier montage, pour valider la direction.</p></li>
+      <li class="step rv" style="transition-delay:.2s"><span class="mono">Étape 3</span><h3>On ajuste</h3><p>Vos retours, nos corrections, autant de tours que nécessaire. <span class="todo">À compléter</span></p></li>
       <li class="step rv" style="transition-delay:.3s"><span class="mono">Étape 4</span><h3>Livraison</h3><p>Mise en ligne ou export final, avec une prise en main si besoin.</p></li>
     </ol>
   </div>
@@ -284,7 +287,7 @@ footer a{text-underline-offset:3px}
 
 <section id="realisations">
   <div class="wrap">
-    <div class="head rv"><p class="mono">03 — Réalisations</p><h2>Ce que j'ai déjà monté.</h2></div>
+    <div class="head rv"><p class="mono">03 — Réalisations</p><h2>Nos réalisations.</h2></div>
     <div class="work">
       <div class="frame rv"><div><b>Projet site web n°1</b><small>À COMPLÉTER : capture + lien</small></div></div>
       <div class="frame rv" style="transition-delay:.1s"><div><b>Projet vidéo n°1</b><small>À COMPLÉTER : extrait vidéo</small></div></div>
@@ -296,11 +299,11 @@ footer a{text-underline-offset:3px}
 
 <section id="apropos" style="background:var(--paper-2);border-block:1px solid var(--ink)">
   <div class="wrap about">
-    <div class="photo rv">À COMPLÉTER<br>Ta photo</div>
+    <div class="photo rv" aria-hidden="true"><svg viewBox="0 0 40 40" width="46%" fill="none"><rect x="8" y="5" width="7" height="30" fill="currentColor"/><path d="M15 21 30 6" stroke="var(--rec)" stroke-width="7"/><path d="M15 19 30 34" stroke="currentColor" stroke-width="7"/></svg></div>
     <div class="rv">
       <p class="mono" style="color:var(--rec);margin-bottom:18px">04 — À propos</p>
-      <p>Je m'appelle Bryant, et Kinéo est mon studio. Je fais des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre, sans jargon et sans surprise sur le résultat.</p>
-      <p>Je travaille avec vous du début à la fin : vous avez un seul interlocuteur, et vous voyez le projet avancer à chaque étape. <span class="todo">À compléter : ton parcours, 2-3 phrases</span></p>
+      <p>Kinéo, c'est un groupe qui fait des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre, sans jargon et sans surprise sur le résultat.</p>
+      <p>Nous travaillons à plusieurs, et vous voyez votre projet avancer à chaque étape.</p>
     </div>
   </div>
 </section>
@@ -309,8 +312,11 @@ footer a{text-underline-offset:3px}
   <div class="wrap">
     <p class="mono" style="color:#c2410c;margin-bottom:22px">05 — Contact</p>
     <h2 class="rv">Un projet ? <em>Parlons-en.</em></h2>
-    <p class="rv">Décrivez-moi votre idée en quelques lignes, je reviens vers vous avec une première proposition.</p>
-    <a class="btn rv" href="mailto:douaogninlin@icloud.com?subject=Mon%20projet">Écrire un e-mail</a><span class="todo">À compléter : e-mail pro / WhatsApp / Instagram</span>
+    <p class="rv">Décrivez-nous votre idée en quelques lignes, nous revenons vers vous avec une première proposition.</p>
+    <a class="btn rv" href="mailto:douaogninlin@icloud.com?subject=Mon%20projet">Écrire un e-mail</a>
+    <ul class="soc rv" aria-label="Réseaux sociaux, bientôt disponibles">
+      <li>WhatsApp <small>bientôt</small></li><li>Instagram <small>bientôt</small></li><li>TikTok <small>bientôt</small></li><li>X <small>bientôt</small></li>
+    </ul>
   </div>
 </section>
 </main>
