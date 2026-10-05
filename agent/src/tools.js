@@ -1,7 +1,8 @@
 // Les outils que Claude peut appeler, et leur exécution côté serveur.
-import { FACTS, etapeLabel } from "./config.js";
-import { sendText } from "./whatsapp.js";
-import { getLead, getProject, projectsFor, saveCallback, saveLead, setHuman } from "./store.js";
+import { etapeLabel } from "./config.js";
+import { notifyOwner } from "./notify.js";
+import { fmtFcfa, payLink } from "./pay.js";
+import { getLead, getProject, paymentsFor, projectsFor, saveCallback, saveLead, setHuman } from "./store.js";
 
 const TYPES = ["site", "video", "digital", "autre"];
 
@@ -38,6 +39,13 @@ export const TOOLS = [
     },
   },
   {
+    name: "get_payments",
+    description:
+      "Donne les paiements et les liens de paiement du client (montant, objet, statut). Sert à répondre « j'ai payé, avez-vous reçu ? » ou à renvoyer un lien de paiement encore en attente. Tu ne crées jamais de lien toi-même : c'est l'équipe qui les émet.",
+    strict: true,
+    input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
+  },
+  {
     name: "request_callback",
     description:
       "Note la demande d'un client qui veut être rappelé ou fixer un point. L'équipe confirmera l'horaire : n'annonce jamais d'heure précise.",
@@ -65,16 +73,6 @@ export const TOOLS = [
     },
   },
 ];
-
-export async function notifyOwner(env, text) {
-  if (!env.OWNER_NUMBER) return;
-  const r = await sendText(env, env.OWNER_NUMBER, text);
-  // Hors fenêtre de 24 h, seul un modèle pré-approuvé passe : voir README (TEMPLATE_OWNER_ALERT).
-  if (!r.ok && env.TEMPLATE_OWNER_ALERT) {
-    const { sendTemplate } = await import("./whatsapp.js");
-    await sendTemplate(env, env.OWNER_NUMBER, env.TEMPLATE_OWNER_ALERT, [text.slice(0, 180)]);
-  }
-}
 
 const show = (n) => (n && n.startsWith("225") ? `+${n}` : `+${n}`);
 
@@ -123,6 +121,19 @@ export async function runTool(env, ctx, name, input) {
       });
     }
 
+    case "get_payments": {
+      const list = (await paymentsFor(env, ctx.wa)).slice(0, 5);
+      if (!list.length) return JSON.stringify({ found: false, message: "Aucun paiement ni lien de paiement pour ce numéro. Si le client attend un lien, propose de passer la main à l'équipe." });
+      const statut = { pending: "en attente de paiement", paid: "payé", failed: "échoué" };
+      return JSON.stringify({
+        found: true,
+        paiements: list.map((p) => ({
+          reference: p.ref, objet: p.label, montant: fmtFcfa(p.amount), statut: statut[p.status] || p.status,
+          lien_de_paiement: p.status === "pending" ? payLink(env, p.ref) : undefined,
+        })),
+      });
+    }
+
     case "request_callback": {
       await saveCallback(env, ctx.wa, { name: ctx.name, preferred_time: input.preferred_time, topic: input.topic });
       await notifyOwner(env, `Demande de rappel — ${ctx.name || "sans nom"} (${show(ctx.wa)})\nSujet : ${input.topic}\nMoment souhaité : ${input.preferred_time}\nRépondez-lui pour confirmer l'horaire.`);
@@ -144,4 +155,3 @@ export async function runTool(env, ctx, name, input) {
   }
 }
 
-export { FACTS };

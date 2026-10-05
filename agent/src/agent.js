@@ -3,7 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { MESSAGES, systemPrompt } from "./config.js";
 import { sendText } from "./whatsapp.js";
 import { getConv, isHuman, saveConv } from "./store.js";
-import { TOOLS, notifyOwner, runTool } from "./tools.js";
+import { notifyOwner } from "./notify.js";
+import { TOOLS, runTool } from "./tools.js";
 
 const MAX_STEPS = 6; // un message client ne peut pas déclencher plus de 6 allers-retours avec Claude
 

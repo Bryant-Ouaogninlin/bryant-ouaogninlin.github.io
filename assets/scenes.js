@@ -262,9 +262,32 @@ function sceneHello(S,canvas){
   };
 }
 
+// ---------- scène paiement reçu : le lapin saute de joie sous une pluie de pièces ----------
+function sceneWin(S,canvas){
+  S.cam.position.set(0,96,520); S.cam.lookAt(0,92,0);
+  var coinM=accM(); S_edges.push({material:coinM});
+  var coins=[]; for(var i=0;i<16;i++){
+    var c=new THREE.Mesh(new THREE.CylinderGeometry(7,7,1.6,28),i%3?coinM:creamM); c.rotation.x=Math.PI/2; S.scene.add(c);
+    coins.push({m:c,x:(i/16-.5)*190+Math.sin(i*7)*12,off:i*.37,spd:.55+(i%5)*.07,spin:2+(i%4)*.7});
+  }
+  var ring=new THREE.Mesh(new THREE.TorusGeometry(100,1,12,160),accM()); ring.position.set(0,92,-60); S.scene.add(ring); S_edges.push(ring);
+  S.bunny.group.position.set(0,0,0);
+  return function(t,dt){
+    var lt=t%2.4, up=lt<1.1?Math.sin(Math.PI*lt/1.1):0, land=lt>=1.1&&lt<1.35?Math.sin(Math.PI*(lt-1.1)/.25):0;
+    var P={yaw:-.95+Math.sin(t*.8)*.1,lean:.0,h:up*30,sq:up*.1-land*.12,crouch:land*7+(lt<.25?Math.sin(Math.PI*lt/.25)*6:0),
+      blink:1-.92*tri(t%3.3,2,.07),mouth:'joy',brow:-2.5,tuck:up*8,
+      footF:[10,0],footB:[-10,0],handF:[14,-34-up*4],handB:[0,-38-up*4],elbowF:-1,elbowB:-1,earA:-.2-up*.5+land*.4,kick:0};
+    S.bunny.update(P,dt);
+    coins.forEach(function(c){var u=((t*c.spd+c.off)%3)/3; c.m.position.set(c.x+Math.sin(t+c.off)*8,210-u*230,Math.sin(c.off*3)*30); c.m.rotation.y=t*c.spin; c.m.rotation.x=Math.PI/2});
+    ring.rotation.z=t*.2;
+    var o=S.bunny.group; S.shadow.scale.set(70*(1-up*.3),70*(1-up*.3),1); S.shadow.position.set(0,.5,0);
+  };
+}
+
 // ---------- boucle commune ----------
-var builders={web:sceneWeb,video:sceneVideo,digital:sceneDigital,boxing:sceneBoxing,hello:sceneHello};
-document.querySelectorAll('canvas[data-scene]').forEach(function(cv){
+var builders={web:sceneWeb,video:sceneVideo,digital:sceneDigital,boxing:sceneBoxing,hello:sceneHello,win:sceneWin};
+function initScenes(){document.querySelectorAll('canvas[data-scene]').forEach(function(cv){
+  if(cv._k) return; cv._k=1;
   var b=builders[cv.getAttribute('data-scene')]; if(!b) return;
   var S=makeStage(cv); if(!S) return;
   var FREEZE=new URLSearchParams(location.search).has('freeze'), anim=b(S,cv), vis=false, last=0, t=+(new URLSearchParams(location.search).get('t'))||0, raf=0;
@@ -279,4 +302,6 @@ document.querySelectorAll('canvas[data-scene]').forEach(function(cv){
   document.addEventListener('visibilitychange',function(){if(!document.hidden&&vis)start()});
   if(reduce||FREEZE){ vis=true; if(!t) t=3.2; for(var tt=0;tt<t;tt+=.02) anim(tt,.02); anim(t,.02); S.renderer.render(S.scene,S.cam) }
   cv.classList.add('live');
-});
+});}
+initScenes();
+window.addEventListener('kineo:scene',initScenes);

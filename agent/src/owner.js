@@ -1,6 +1,7 @@
 // Commandes réservées au propriétaire : il pilote l'agent depuis son propre WhatsApp.
 import { FACTS, etapeLabel } from "./config.js";
-import { createProject, getProject, listLeads, listProjects, projectsFor, setHuman, updateProject } from "./store.js";
+import { createProject, getProject, listLeads, listPayments, listProjects, projectsFor, setHuman, updateProject } from "./store.js";
+import { createPayment, fmtFcfa, payLink, recordManualPayment } from "./pay.js";
 import { isWindowError, normalizeNumber, sendTemplate, sendText } from "./whatsapp.js";
 
 const AIDE = `Commandes Kinéo
@@ -11,13 +12,17 @@ const AIDE = `Commandes Kinéo
 /etape K-001 proposition | message pour le client (facultatif) : change l'étape et prévient le client
    étapes : discussion, proposition, ajustements, livraison, termine
 /note K-001 texte : note interne (non visible du client)
+/paiement K-001 50000 | acompte : crée un lien de paiement (montant multiple de 5) et l'envoie au client
+/paiement 2250505483481 25000 | Retouches : idem pour un client sans projet
+/paiements : les 10 derniers paiements
+/paye K-001 25000 | espèces : enregistre un paiement reçu hors ligne
 /prendre 225XXXXXXXXXX : l'agent se tait pour ce client
 /reprendre 225XXXXXXXXXX : l'agent reprend
 /dire 225XXXXXXXXXX message : envoie un message au client`;
 
 const fmtDate = (iso) => (iso ? iso.slice(0, 10) : "");
 
-export async function handleOwnerCommand(env, text) {
+export async function handleOwnerCommand(env, text, request) {
   const trimmed = text.trim();
   const sp = trimmed.search(/\s/);
   const cmd = (sp === -1 ? trimmed : trimmed.slice(0, sp)).toLowerCase();
@@ -68,6 +73,43 @@ export async function handleOwnerCommand(env, text) {
       return r.ok
         ? `${proj.code} passé à « ${known.label} » ; ${how} au client.`
         : `${proj.code} passé à « ${known.label} », mais le client n'a pas pu être prévenu (il n'a pas écrit depuis plus de 24 h et aucun modèle de message n'est configuré). Il verra l'étape en demandant à l'agent.`;
+    }
+
+    case "/paiement":
+    case "/paye": {
+      const [head, ...lab] = arg.split("|");
+      const [who, amountRaw] = head.trim().split(/\s+/);
+      const amount = Number(String(amountRaw || "").replace(/[^\d]/g, ""));
+      const label = lab.join("|").trim() || "Prestation Kinéo";
+      if (!who || !amount) return `Exemple : ${cmd} K-001 50000 | acompte`;
+      let wa, name = "", project = "", pLabel = label;
+      if (/^k-\d+$/i.test(who)) {
+        const proj = await getProject(env, who);
+        if (!proj) return "Projet introuvable. Voir /projets.";
+        wa = proj.wa; name = proj.name; project = proj.code;
+        pLabel = `${label}${proj.title ? " — " + proj.title : ""}`;
+      } else {
+        wa = normalizeNumber(who);
+        if (!wa) return "Numéro ou code projet non reconnu.";
+      }
+      if (cmd === "/paye") {
+        const p = await recordManualPayment(env, { amount, label: pLabel, wa, name, project, method: "hors ligne" });
+        return `Paiement de ${fmtFcfa(amount)} enregistré (${p.ref}) ; le client est remercié.`;
+      }
+      const r = await createPayment(env, request, { amount, label: pLabel, wa, name, project });
+      if (!r.ok) return r.error;
+      const link = payLink(env, r.pay.ref);
+      const msg = `Bonjour${name ? " " + name : ""}, voici votre lien de paiement sécurisé pour ${pLabel} : ${fmtFcfa(amount)}.\n${link}\nVous pouvez payer avec Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire.`;
+      let sent = await sendText(env, wa, msg);
+      if (isWindowError(sent) && env.TEMPLATE_PAYMENT_LINK) sent = await sendTemplate(env, wa, env.TEMPLATE_PAYMENT_LINK, [name || "", fmtFcfa(amount), link]);
+      return `${r.pay.ref} créé : ${fmtFcfa(amount)} pour ${pLabel}.\nLien : ${link}\n` + (sent.ok ? "Envoyé au client." : "Le client n'a pas pu être prévenu (plus de 24 h sans message) : transmettez-lui le lien vous-même.");
+    }
+
+    case "/paiements": {
+      const ps = await listPayments(env, 10);
+      if (!ps.length) return "Aucun paiement pour l'instant.";
+      const st = { pending: "en attente", paid: "payé", failed: "échoué" };
+      return ps.map((p) => `${p.ref} — ${fmtFcfa(p.amount)} — ${p.label} — ${st[p.status] || p.status}`).join("\n");
     }
 
     case "/note": {

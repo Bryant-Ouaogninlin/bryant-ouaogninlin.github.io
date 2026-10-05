@@ -16,7 +16,7 @@ class FakeKV {
 
 // ---------- faux Meta + faux Anthropic ----------
 function makeWorld(script) {
-  const world = { sent: [], reads: [], anthropic: [], script: [...script], anthropicStatus: 200 };
+  const world = { sent: [], reads: [], anthropic: [], cinetpay: [], script: [...script], anthropicStatus: 200 };
   world.fetch = async (url, init = {}) => {
     const u = String(url);
     const body = init.body ? JSON.parse(init.body) : {};
@@ -34,6 +34,17 @@ function makeWorld(script) {
         content: next.content, usage: { input_tokens: 10, output_tokens: 5 },
       }), { status: 200, headers: { "content-type": "application/json" } });
     }
+    if (u.includes("api-checkout.cinetpay.com")) {
+      world.cinetpay.push({ url: u, body });
+      if (u.endsWith("/v2/payment")) {
+        if (world.cinetpayInitFail) return new Response(JSON.stringify({ code: "608", message: "MINIMUM_REQUIRED_FIELDS" }), { status: 200 });
+        return new Response(JSON.stringify({ code: "201", message: "CREATED", data: { payment_token: "tok_" + body.transaction_id, payment_url: "https://checkout.cinetpay.com/payment/tok_" + body.transaction_id } }), { status: 200 });
+      }
+      if (u.endsWith("/v2/payment/check")) {
+        const r = world.checkReply ?? { code: "662", message: "WAITING_CUSTOMER_PAYMENT", data: { status: "WAITING_FOR_CUSTOMER" } };
+        return new Response(JSON.stringify(r), { status: 200 });
+      }
+    }
     throw new Error("URL inattendue : " + u);
   };
   return world;
@@ -44,6 +55,7 @@ const OWNER = "2250700000001";
 const mkEnv = (world) => ({
   KV: new FakeKV(), FETCH: world.fetch, ANTHROPIC_API_KEY: "sk-test", WHATSAPP_TOKEN: "tok", WHATSAPP_PHONE_ID: "123",
   WHATSAPP_VERIFY_TOKEN: "verif", WHATSAPP_APP_SECRET: SECRET, OWNER_NUMBER: OWNER, MODEL: "claude-opus-5-5", EFFORT: "medium",
+  CINETPAY_API_KEY: "cp-key", CINETPAY_SITE_ID: "cp-site", SITE_URL: "https://site.test", WORKER_URL: "https://agent.test",
 });
 
 let counter = 0;
@@ -106,7 +118,7 @@ console.log("\n2. Un nouveau client : l'agent enregistre la demande et répond")
   ok(req1.output_config?.effort === "medium", "effort réglé explicitement");
   ok(req1.temperature === undefined && req1.top_p === undefined && req1.thinking === undefined, "aucun paramètre refusé par ce modèle (température, thinking)");
   ok(req1.system[0].cache_control?.type === "ephemeral" && !JSON.stringify(req1.system[0]).includes("Abidjan"), "le bloc stable est mis en cache, sans donnée qui change");
-  ok(req1.tools.length === 4 && req1.tools.every((t) => t.strict === true), "4 outils, arguments garantis par le schéma (strict)");
+  ok(req1.tools.length === 5 && req1.tools.every((t) => t.strict === true), "5 outils, arguments garantis par le schéma (strict)");
   const last = req2.messages[req2.messages.length - 1];
   ok(last.role === "user" && last.content[0].type === "tool_result" && last.content[0].tool_use_id === "tu_1", "le résultat de l'outil est renvoyé à Claude dans un seul message");
 
@@ -193,6 +205,91 @@ console.log("\n5. Cas limites");
 
   const R = await post(env, webhook(OWNER, "/inconnue", { name: "Moi" }));
   ok(textsTo(w, OWNER).at(-1).includes("/aide"), "une commande inconnue renvoie vers /aide");
+}
+
+console.log("\n6. Paiements CinetPay");
+{
+  const P = "2250505000006";
+  const w = makeWorld([]); const env = mkEnv(w);
+  const own = (t) => post(env, webhook(OWNER, t, { name: "Moi" }));
+  const lastOwner = () => textsTo(w, OWNER).at(-1);
+
+  await own("/nouveau 05 05 00 00 06 | Mariam | site | Site de mariage");
+  await own("/paiement K-001 50003 | acompte");
+  ok(lastOwner().includes("multiple de 5") && w.cinetpay.length === 0, "un montant qui n'est pas un multiple de 5 est refusé avant tout appel à CinetPay");
+  await own("/paiement K-001 50 | acompte");
+  ok(lastOwner().includes("au moins 100"), "un montant trop petit est refusé");
+
+  await own("/paiement K-001 50000 | acompte");
+  const init = w.cinetpay.find((c) => c.url.endsWith("/v2/payment"));
+  ok(init && init.body.amount === 50000 && init.body.currency === "XOF" && init.body.apikey === "cp-key" && init.body.site_id === "cp-site", "le lien est créé chez CinetPay (50 000 XOF, clés envoyées)");
+  ok(init.body.notify_url === "https://agent.test/pay/notify" && init.body.return_url.startsWith("https://agent.test/pay/return?ref="), "adresses de notification et de retour pointent vers le Worker");
+  ok(!/[#\/$_&]/.test(init.body.description) && /^[A-Z0-9]+$/.test(init.body.transaction_id), "description et identifiant sans caractères interdits par CinetPay");
+  const ref = init.body.transaction_id;
+  const toClient = textsTo(w, P).at(-1);
+  ok(toClient.includes("50 000 FCFA") && toClient.includes(`https://site.test/paiement.html?ref=${ref}`), "le client reçoit un lien vers la page de paiement du site");
+
+  // statut public
+  const st1 = await worker.fetch(new Request(`https://agent.test/pay/status?ref=${ref}`), env, { waitUntil() {} });
+  const j1 = await st1.json();
+  ok(st1.status === 200 && j1.status === "pending" && j1.url.includes("checkout.cinetpay.com") && j1.amount === 50000, "la page du site peut lire le statut et l'adresse de paiement");
+  ok(!JSON.stringify(j1).includes(P) && !JSON.stringify(j1).includes("Mariam"), "le statut public ne contient aucune donnée personnelle");
+  ok(st1.headers.get("access-control-allow-origin") === "https://site.test", "seul le site est autorisé à lire ce statut (CORS)");
+  const st404 = await worker.fetch(new Request("https://agent.test/pay/status?ref=INCONNU1"), env, { waitUntil() {} });
+  ok(st404.status === 404, "une référence inconnue renvoie 404");
+
+  // fausse notification : CinetPay dit « en attente » -> rien ne change
+  const notify = async (r) => { const waits = []; const res = await worker.fetch(new Request("https://agent.test/pay/notify", { method: "POST", body: new URLSearchParams({ cpm_trans_id: r }), headers: { "content-type": "application/x-www-form-urlencoded" } }), env, { waitUntil: (p) => waits.push(p) }); await Promise.all(waits); return res; };
+  const ownerBefore = textsTo(w, OWNER).length;
+  await notify(ref);
+  ok(JSON.parse(await env.KV.get(`pay:${ref}`)).status === "pending" && textsTo(w, OWNER).length === ownerBefore, "une notification seule ne valide rien : on vérifie auprès de CinetPay");
+
+  // CinetPay annonce un paiement d'un AUTRE montant : refusé et signalé
+  w.checkReply = { code: "00", message: "SUCCES", data: { status: "ACCEPTED", amount: "100", currency: "XOF", payment_method: "OM" } };
+  await notify(ref);
+  ok(JSON.parse(await env.KV.get(`pay:${ref}`)).status === "pending" && textsTo(w, OWNER).at(-1).includes("ne correspond pas"), "un paiement dont le montant ne correspond pas n'est pas accepté et vous êtes alerté");
+
+  // le vrai paiement
+  w.checkReply = { code: "00", message: "SUCCES", data: { status: "ACCEPTED", amount: "50000", currency: "XOF", payment_method: "WAVECI", payment_date: "2026-10-05 15:00:00" } };
+  await notify(ref);
+  const paid = JSON.parse(await env.KV.get(`pay:${ref}`));
+  ok(paid.status === "paid" && paid.method === "WAVECI", "le paiement vérifié est marqué payé");
+  ok(textsTo(w, OWNER).at(-1).includes("Paiement reçu") && textsTo(w, OWNER).at(-1).includes("50 000 FCFA"), "vous êtes prévenu du paiement");
+  ok(textsTo(w, P).at(-1).includes("bien reçu votre paiement"), "le client reçoit un accusé de réception");
+  ok(JSON.parse(await env.KV.get("proj:K-001")).paid === 50000, "le total payé est ajouté au projet");
+
+  // idempotence : une notification en double ne crée pas de second message
+  const before = w.sent.length;
+  await notify(ref);
+  ok(w.sent.length === before, "une notification en double n'envoie rien de plus");
+
+  // retour du client
+  const ret = await worker.fetch(new Request(`https://agent.test/pay/return?ref=${ref}`, { method: "POST" }), env, { waitUntil() {} });
+  ok(ret.status === 303 && ret.headers.get("location") === `https://site.test/paiement.html?ref=${ref}`, "le retour du client (même en POST) est redirigé vers le site");
+
+  // l'agent peut renvoyer un lien en attente, jamais en créer
+  await own("/paiement K-001 25000 | solde");
+  const ref2 = w.cinetpay.filter((c) => c.url.endsWith("/v2/payment")).at(-1).body.transaction_id;
+  w.script = [toolUse("tu_p", "get_payments", {}), say("Voici votre lien.")];
+  await post(env, webhook(P, "Pouvez-vous me renvoyer le lien de paiement ?", { name: "Mariam" }));
+  const tm = w.anthropic.at(-1).body.messages.at(-1).content[0].content;
+  ok(tm.includes(`paiement.html?ref=${ref2}`) && tm.includes('"statut":"payé"'), "l'agent retrouve le lien en attente et le paiement déjà reçu");
+
+  // un autre client ne voit pas ces paiements
+  w.script = [toolUse("tu_q", "get_payments", {}), say("Rien.")];
+  await post(env, webhook("2250505000007", "J'ai payé ?", { name: "Autre" }));
+  ok(w.anthropic.at(-1).body.messages.at(-1).content[0].content.includes('"found":false'), "un autre client ne voit aucun paiement");
+
+  // paiement hors ligne et liste
+  await own("/paye K-001 10000 | espèces");
+  ok(lastOwner().includes("enregistré") && JSON.parse(await env.KV.get("proj:K-001")).paid === 60000, "/paye enregistre un paiement hors ligne");
+  await own("/paiements");
+  ok(lastOwner().includes("payé") && lastOwner().includes("en attente"), "/paiements liste les paiements et leur statut");
+
+  // CinetPay refuse la création : message clair
+  w.cinetpayInitFail = true;
+  await own("/paiement K-001 5000 | test");
+  ok(lastOwner().includes("CinetPay a refusé"), "si CinetPay refuse la demande, vous recevez une explication");
 }
 
 console.log(`\n${passed} réussis, ${failed} échoués`);

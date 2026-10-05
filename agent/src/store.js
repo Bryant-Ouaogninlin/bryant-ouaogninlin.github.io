@@ -104,3 +104,33 @@ export async function saveCallback(env, wa, data) {
   await env.KV.put(id, j({ wa, ...data, created: new Date().toISOString() }), { expirationTtl: 60 * 60 * 24 * 30 });
   return id;
 }
+
+// ---------- paiements ----------
+export const getPayment = (env, ref) => getJSON(env, `pay:${ref}`);
+
+export async function savePayment(env, pay) {
+  const isNew = !(await env.KV.get(`pay:${pay.ref}`));
+  await env.KV.put(`pay:${pay.ref}`, j(pay));
+  if (isNew) {
+    const idx = await getJSON(env, "pay:index", []);
+    idx.unshift(pay.ref);
+    await env.KV.put("pay:index", j(idx.slice(0, 300)));
+    const own = await getJSON(env, `payw:${pay.wa}`, []);
+    own.unshift(pay.ref);
+    await env.KV.put(`payw:${pay.wa}`, j(own.slice(0, 50)));
+  }
+}
+
+export async function paymentsFor(env, wa) {
+  const refs = await getJSON(env, `payw:${wa}`, []);
+  const out = [];
+  for (const r of refs) out.push(await getPayment(env, r));
+  return out.filter(Boolean);
+}
+
+export async function listPayments(env, n = 10) {
+  const refs = await getJSON(env, "pay:index", []);
+  const out = [];
+  for (const r of refs.slice(0, n)) out.push(await getPayment(env, r));
+  return out.filter(Boolean);
+}
