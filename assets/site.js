@@ -6,7 +6,7 @@
   var tl=document.getElementById('timeline');
   function laneWidth(){var lane=document.querySelector('.lane'); if(lane&&tl) tl.style.setProperty('--lane',(lane.offsetWidth-2)+'px')}
   laneWidth(); addEventListener('resize',laneWidth);
-  function begin(){requestAnimationFrame(function(){requestAnimationFrame(function(){document.body.classList.add('ready')})})}
+  function begin(){requestAnimationFrame(function(){requestAnimationFrame(function(){document.body.classList.add('ready');document.dispatchEvent(new Event('kineo:begin'))})})}
   window.kineoBegin=begin;
   if(!root.classList.contains('intro-on')) begin();   // sur l'accueil, l'intro appelle begin() à la fin
 
