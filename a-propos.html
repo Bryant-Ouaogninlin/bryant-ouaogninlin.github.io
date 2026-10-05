@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=22">
 </head>
 <body>
 <div class="playhead" id="playhead" aria-hidden="true"></div>
@@ -29,11 +29,15 @@
   <p class="lead">Un groupe, des sites, du montage et du digital.</p>
 </div></section>
 <section style="padding-top:20px">
-  <div class="wrap about">
-    <div class="photo rv" aria-hidden="true"><svg viewBox="0 0 40 40" width="46%" fill="none"><rect x="8" y="5" width="7" height="30" fill="currentColor"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="var(--rec)"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="currentColor"/></svg></div>
+  <div class="wrap about2">
+    <div class="scene tall rv"><canvas data-scene="hello" aria-hidden="true"></canvas><span class="mono">Salut, on est Kinéo</span></div>
     <div class="rv">
-      <p>Kinéo, c'est un groupe qui fait des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre, sans jargon et sans surprise sur le résultat.</p>
-      <p>Nous travaillons à plusieurs, et vous voyez votre projet avancer à chaque étape.</p>
+      <p class="big">Kinéo, c'est un groupe qui fait des sites, du montage et du digital pour des particuliers qui veulent quelque chose de propre.</p>
+      <ul class="vals">
+        <li><span class="mono">01</span><b>Clair</b><p>Pas de jargon, pas de surprise sur le résultat.</p></li>
+        <li><span class="mono">02</span><b>Suivi</b><p>Vous voyez votre projet avancer à chaque étape.</p></li>
+        <li><span class="mono">03</span><b>Sur mesure</b><p>On part de votre idée, pas d'un modèle.</p></li>
+      </ul>
     </div>
   </div>
 </section>
@@ -45,10 +49,11 @@
 <footer>
   <div class="wrap">
     <span>© 2026 Kinéo · <a href="mailto:kineo.digital@gmail.com">kineo.digital@gmail.com</a></span>
-    <span><a href="legal.html">Mentions légales &amp; confidentialité</a> · <a href="cyber.html">Portfolio cybersécurité</a></span>
+    <span><a href="legal.html">Mentions légales &amp; confidentialité</a></span>
   </div>
 </footer>
-<script src="assets/site.js?v=13"></script>
-<script src="assets/fx.js?v=13"></script>
+<script src="assets/site.js?v=22"></script>
+<script src="assets/fx.js?v=22"></script>
+<script type="module" src="assets/scenes.js?v=22"></script>
 </body>
 </html>

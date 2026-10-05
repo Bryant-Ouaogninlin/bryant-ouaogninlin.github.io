@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=17">
 </head>
 <body>
 <div class="playhead" id="playhead" aria-hidden="true"></div>
@@ -30,29 +30,26 @@
 </div></section>
 <section style="padding-top:20px"><div class="wrap">
     <div class="svc">
-      <article class="row rv">
+      <article class="row scene-row rv">
         <span class="n">V1</span>
-        <h3>Création de sites web</h3>
-        <div>
+        <div class="txt"><h3>Création de sites web</h3>
           <p>Un site à votre image, simple à lire sur téléphone comme sur ordinateur.</p>
-          <ul><li>Site vitrine ou portfolio personnel</li><li>Page pour un événement, un projet, une activité</li><li>Mise en ligne et nom de domaine</li></ul>
-        </div>
+          <ul><li>Site vitrine ou portfolio personnel</li><li>Page pour un événement, un projet, une activité</li><li>Mise en ligne et nom de domaine</li></ul></div>
+        <div class="scene"><canvas data-scene="web" aria-hidden="true"></canvas><span class="mono">V1 · Un site qui se construit</span></div>
       </article>
-      <article class="row rv">
+      <article class="row scene-row rv">
         <span class="n">V2</span>
-        <h3>Montage vidéo</h3>
-        <div>
+        <div class="txt"><h3>Montage vidéo</h3>
           <p>Vos images deviennent une vidéo qu'on a envie de regarder jusqu'au bout.</p>
-          <ul><li>Souvenirs, événements, moments de vie</li><li>Formats courts pour les réseaux sociaux</li><li>Étalonnage, sous-titres, musique</li></ul>
-        </div>
+          <ul><li>Souvenirs, événements, moments de vie</li><li>Formats courts pour les réseaux sociaux</li><li>Étalonnage, sous-titres, musique</li></ul></div>
+        <div class="scene"><canvas data-scene="video" aria-hidden="true"></canvas><span class="mono">V2 · Chaque image à sa place</span></div>
       </article>
-      <article class="row rv">
+      <article class="row scene-row rv">
         <span class="n">A1</span>
-        <h3>Digital</h3>
-        <div>
+        <div class="txt"><h3>Digital</h3>
           <p>Tout ce qui fait vivre votre présence en ligne une fois le site et les vidéos prêts.</p>
-          <ul><li>Visuels et habillage de vos comptes</li><li>Mise en place de vos profils</li><li>Conseils concrets pour être trouvé</li></ul>
-        </div>
+          <ul><li>Visuels et habillage de vos comptes</li><li>Mise en place de vos profils</li><li>Conseils concrets pour être trouvé</li></ul></div>
+        <div class="scene"><canvas data-scene="digital" aria-hidden="true"></canvas><span class="mono">A1 · Publier et se faire voir</span></div>
       </article>
     </div>
     <p class="mono rv" style="margin-top:22px;color:var(--muted)">Tarifs : sur devis, selon le projet <span style="color:var(--rec)">· À COMPLÉTER si grille de prix</span></p>
@@ -77,10 +74,11 @@
 <footer>
   <div class="wrap">
     <span>© 2026 Kinéo · <a href="mailto:kineo.digital@gmail.com">kineo.digital@gmail.com</a></span>
-    <span><a href="legal.html">Mentions légales &amp; confidentialité</a> · <a href="cyber.html">Portfolio cybersécurité</a></span>
+    <span><a href="legal.html">Mentions légales &amp; confidentialité</a></span>
   </div>
 </footer>
-<script src="assets/site.js?v=13"></script>
-<script src="assets/fx.js?v=13"></script>
+<script src="assets/site.js?v=17"></script>
+<script src="assets/fx.js?v=17"></script>
+<script type="module" src="assets/scenes.js?v=17"></script>
 </body>
 </html>

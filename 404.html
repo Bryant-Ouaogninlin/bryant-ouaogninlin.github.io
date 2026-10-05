@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=22">
 </head>
 <body>
 <div class="playhead" id="playhead" aria-hidden="true"></div>
@@ -22,14 +22,25 @@
     <div class="right" aria-hidden="true"><span class="chap" id="chap">Accueil</span><span class="tc" id="tc">00:00:00:00</span></div>
   </div>
 </header>
-<main><section class="phero"><div class="wrap"><span class="mono">404</span><h1><span class="w"><span>Cette</span></span> <span class="w"><span>page</span></span> <span class="w"><span><em>n'existe</em></span></span> <span class="w"><span>pas.</span></span></h1><p class="lead">Retournez à l'<a href="index.html">accueil</a> ou écrivez-nous depuis la page <a href="contact.html">contact</a>.</p></div></section></main>
+<main>
+<section class="err"><div class="wrap err-grid">
+  <div>
+    <span class="mono" data-scramble>Erreur 404</span>
+    <h1><span class="w"><span>Cette</span></span> <span class="w"><span>page</span></span> <span class="w"><span><em>n'existe</em></span></span> <span class="w"><span>pas.</span></span></h1>
+    <p class="lead">Notre lapin s'entraîne dessus en attendant. Retournez à l'accueil, ou écrivez-nous si vous cherchiez quelque chose de précis.</p>
+    <div class="cta"><a class="btn solid" href="index.html">Retour à l'accueil</a><a class="btn line" href="contact.html">Nous contacter</a></div>
+  </div>
+  <div class="scene wide"><canvas data-scene="boxing" aria-hidden="true"></canvas><span class="mono">404 · Entraînement en cours</span></div>
+</div></section>
+</main>
 <footer>
   <div class="wrap">
     <span>© 2026 Kinéo · <a href="mailto:kineo.digital@gmail.com">kineo.digital@gmail.com</a></span>
-    <span><a href="legal.html">Mentions légales &amp; confidentialité</a> · <a href="cyber.html">Portfolio cybersécurité</a></span>
+    <span><a href="legal.html">Mentions légales &amp; confidentialité</a></span>
   </div>
 </footer>
-<script src="assets/site.js?v=13"></script>
-<script src="assets/fx.js?v=13"></script>
+<script src="assets/site.js?v=22"></script>
+<script src="assets/fx.js?v=22"></script>
+<script type="module" src="assets/scenes.js?v=22"></script>
 </body>
 </html>
