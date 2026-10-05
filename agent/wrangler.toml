@@ -1,0 +1,20 @@
+name = "kineo-agent"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Réglages non secrets (modifiables ici ou dans le tableau de bord Cloudflare)
+[vars]
+MODEL = "claude-opus-5-5"   # voir README : "claude-sonnet-5-5" est environ 2 fois moins cher
+EFFORT = "medium"           # low | medium | high : plus c'est bas, plus c'est rapide et peu coûteux
+
+# Mémoire de l'agent (conversations, demandes, projets). À créer : voir README, étape 3.
+[[kv_namespaces]]
+binding = "KV"
+id = "REMPLACER_PAR_L_ID_DU_KV"
+
+# Secrets à ajouter dans Cloudflare (jamais dans ce fichier) :
+#   ANTHROPIC_API_KEY, WHATSAPP_TOKEN, WHATSAPP_PHONE_ID,
+#   WHATSAPP_VERIFY_TOKEN, WHATSAPP_APP_SECRET, OWNER_NUMBER
+# Optionnels (messages proactifs hors fenêtre de 24 h) :
+#   TEMPLATE_OWNER_ALERT, TEMPLATE_PROJECT_UPDATE

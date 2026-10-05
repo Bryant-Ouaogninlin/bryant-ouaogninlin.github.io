@@ -1,0 +1,17 @@
+{
+  "name": "kineo-agent",
+  "private": true,
+  "type": "module",
+  "description": "Agent WhatsApp de Kinéo : accueil, qualification, suivi de projet (Claude + WhatsApp Cloud API sur Cloudflare Workers)",
+  "scripts": {
+    "test": "node test/run.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
