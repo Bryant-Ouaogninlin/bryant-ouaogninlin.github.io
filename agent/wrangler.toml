@@ -2,11 +2,13 @@ name = "kineo-agent"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true          # adresse publique kineo-agent.kineo-digi.workers.dev
 
 # Réglages non secrets (modifiables ici ou dans le tableau de bord Cloudflare)
 [vars]
 MODEL = "claude-opus-5-5"   # voir README : "claude-sonnet-5-5" est environ 2 fois moins cher
 EFFORT = "medium"           # low | medium | high : plus c'est bas, plus c'est rapide et peu coûteux
+# AGENT_MODE = "menu"       # force le menu sans IA (utilisé automatiquement tant qu'il n'y a pas de clé ANTHROPIC_API_KEY)
 
 # Mémoire de l'agent (conversations, demandes, projets). À créer : voir README, étape 3.
 [[kv_namespaces]]
