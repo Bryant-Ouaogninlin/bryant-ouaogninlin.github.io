@@ -54,8 +54,8 @@
   function q(root, sel) { return root.querySelector(sel); }
   function qa(root, sel) { return [].slice.call(root.querySelectorAll(sel)); }
 
-  var SITE = '<div class="br-bar"><i></i><i></i><i></i><em class="url mono"></em></div>' +
-    '<div class="br-body"><div class="s-nav"><b></b><span></span><span></span><span></span></div>' +
+  var SITE = '<div class="fbr-bar"><i></i><i></i><i></i><em class="url mono"></em></div>' +
+    '<div class="fbr-body"><div class="s-nav"><b></b><span></span><span></span><span></span></div>' +
     '<div class="s-hero"><div class="s-txt"><u class="s-t1"></u><u class="s-t2"></u><u class="s-p"></u><u class="s-p2"></u><b class="s-btn"></b></div>' +
     '<div class="s-img"><s></s></div></div>' +
     '<div class="s-cards"><div class="s-c"></div><div class="s-c"></div><div class="s-c"></div></div></div>';
@@ -96,13 +96,13 @@
 
   // 2 · la fiche projet
   scene(
-    '<div class="card"><span class="mono ct">Fiche projet</span><ul class="rows">' +
+    '<div class="fcard"><span class="mono ct">Fiche projet</span><ul class="rows">' +
     '<li><i class="ck"><s>' + CHECK + '</s></i><b>Pour qui</b><span class="bar" style="--w:58%"></span></li>' +
     '<li><i class="ck"><s>' + CHECK + '</s></i><b>Pour quand</b><span class="bar" style="--w:42%"></span></li>' +
     '<li><i class="ck"><s>' + CHECK + '</s></i><b>Quel style</b><span class="bar" style="--w:66%"></span></li></ul>' +
     '<div class="prog"><span class="mono">Besoin cadré</span><u><s></s></u></div></div><div class="stamp mono">Cadré</div>',
     function (r) {
-      var rows = qa(r, ".rows li"), card = q(r, ".card"), fill = q(r, ".prog s"), stamp = q(r, ".stamp");
+      var rows = qa(r, ".rows li"), card = q(r, ".fcard"), fill = q(r, ".prog s"), stamp = q(r, ".stamp");
       return function (t) {
         S(card, { o: ramp(t, 0, .5), y: (1 - ramp(t, 0, .6)) * 14 });
         var done = 0;
@@ -121,9 +121,9 @@
 
   // 3 · la maquette se construit
   scene(
-    '<div class="br" style="left:90px;top:50px">' + SITE + '</div><div class="mk mono">Maquette · V1</div>' + CURSOR,
+    '<div class="fbr" style="left:90px;top:50px">' + SITE + '</div><div class="mk mono">Maquette · V1</div>' + CURSOR,
     function (r) {
-      var br = q(r, ".br"), url = q(r, ".url"), cur = q(r, ".fk"), mk = q(r, ".mk");
+      var br = q(r, ".fbr"), url = q(r, ".url"), cur = q(r, ".fk"), mk = q(r, ".mk");
       url.textContent = "maquette";
       var items = [
         [q(r, ".s-nav"), .5], [q(r, ".s-t1"), 1.1], [q(r, ".s-t2"), 1.4], [q(r, ".s-p"), 1.8], [q(r, ".s-p2"), 2.0],
@@ -146,12 +146,12 @@
 
   // 4 · on ajuste
   scene(
-    '<div class="br" style="left:90px;top:50px">' + SITE + '</div><div class="mk mono">Maquette · V2</div>' +
+    '<div class="fbr" style="left:90px;top:50px">' + SITE + '</div><div class="mk mono">Maquette · V2</div>' +
     '<div class="sel" style="left:102px;top:126px;width:246px;height:46px"><i></i><i></i><i></i><i></i></div>' +
     '<div class="cm" style="left:236px;top:92px">Un peu plus grand ?</div>' +
     '<div class="rev mono"><span>Tour 1</span><span>Tour 2</span><span class="ok">Validé</span></div>' + CURSOR,
     function (r) {
-      var br = q(r, ".br"), url = q(r, ".url"), cur = q(r, ".fk"), sel = q(r, ".sel"), cm = q(r, ".cm"), rev = qa(r, ".rev span");
+      var br = q(r, ".fbr"), url = q(r, ".url"), cur = q(r, ".fk"), sel = q(r, ".sel"), cm = q(r, ".cm"), rev = qa(r, ".rev span");
       var t1 = q(r, ".s-t1"), t2 = q(r, ".s-t2"), img = q(r, ".s-img");
       url.textContent = "maquette";
       var way = [[0, 540, 300], [.8, 150, 150], [2.6, 150, 150], [3.6, 330, 150], [4.1, 520, 236], [5.5, 538, 236], [8, 538, 236]];
@@ -173,12 +173,12 @@
 
   // 5 · mise en ligne
   scene(
-    '<div class="br" style="left:50px;top:70px;transform:scale(.84)">' + SITE + '</div>' +
+    '<div class="fbr" style="left:50px;top:70px;transform:scale(.84)">' + SITE + '</div>' +
     '<div class="mini"><div class="m-nav"><b></b><span></span></div><div class="m-t"></div><div class="m-p"></div><div class="m-b"></div><div class="m-i"></div></div>' +
     '<div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="badge mono">En ligne</div>' +
     '<div class="done mono" style="left:50px">Publié</div><div class="done mono" style="left:190px">Prise en main</div>',
     function (r) {
-      var br = q(r, ".br"), mini = q(r, ".mini"), badge = q(r, ".badge"), rings = qa(r, ".ring"), done = qa(r, ".done"), url = q(r, ".url");
+      var br = q(r, ".fbr"), mini = q(r, ".mini"), badge = q(r, ".badge"), rings = qa(r, ".ring"), done = qa(r, ".done"), url = q(r, ".url");
       var addr = "votre-site.com";
       return function (t) {
         var n = Math.floor(ramp(t, .5, 2.0, E.lin) * addr.length);
