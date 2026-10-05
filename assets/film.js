@@ -15,6 +15,8 @@
     { d: 8, d0: 8, n: "03", s: "Maquette", t: "On vous montre une maquette", p: "Vous voyez le projet avant qu'il soit fini, pas après." },
     { d: 8, d0: 8, n: "04", s: "Ajuster", t: "On ajuste ensemble", p: "Vos retours, nos corrections, autant de tours que nécessaire." },
     { d: 7, d0: 7, n: "05", s: "En ligne", t: "Mise en ligne", p: "Votre site est publié, et nous vous expliquons comment le prendre en main." },
+    { d: 8, d0: 8, n: "06", s: "Vidéo", t: "Et vos vidéos, bien montées", p: "Souvenirs, événements, formats courts pour les réseaux : on garde ce qui compte, on coupe le reste." },
+    { d: 8, d0: 8, n: "07", s: "Digital", t: "Et votre présence en ligne", p: "Vos profils, vos visuels et des conseils concrets pour qu'on vous trouve." },
   ];
   var START = [], BODY = 0;
   CH.forEach(function (c) { START.push(BODY); BODY += c.d; });
@@ -86,7 +88,7 @@
   }
 
   // ---------- scènes ----------
-  var scenes = [], hudDark = [false, true, false, false, false, true];
+  var scenes = [], hudDark = [false, true, false, false, false, false, true, true];
   function scene(build) {
     var r = el(inner, "sc"); var bg = el(r, "bg"); var cam = el(r, "cam");
     scenes.push({ el: r, draw: build(r, bg, cam) });
@@ -251,6 +253,67 @@
     };
   });
 
+  // F · vos vidéos, bien montées : une vraie table de montage
+  scene(function (r, bg, cam) {
+    bg.style.background = "#0b0d10";
+    var glow = el(cam, "c-glow");
+    var k = kw(cam, "f-k stack", ["Vos vidéos,", "bien montées."], 94);
+    var prev = el(cam, "vprev", '<i class="vp-c"></i><i class="vp-b"></i><i class="vp-r"></i><span class="vp-sub"></span><span class="vp-tc"></span>');
+    var vt = el(cam, "vt", '<div class="vt-ruler"></div>' +
+      '<div class="vt-row" style="top:60px"><b>V1</b><div class="vt-lane"><div class="cl cr" style="left:0;width:24%"><i>Souvenirs</i></div><div class="cl or" style="left:26%;width:22%"><i>Événement</i></div><div class="cl cut" style="left:50%;width:14%"><i>À couper</i></div><div class="cl cr" id="vcl4" style="left:66%;width:32%"><i>Format court</i></div></div></div>' +
+      '<div class="vt-row" style="top:128px"><b>V2</b><div class="vt-lane"><div class="cl gr" style="left:8%;width:40%"><i>Sous-titres</i></div><div class="cl or" style="left:52%;width:30%"><i>Titre</i></div></div></div>' +
+      '<div class="vt-row" style="top:196px"><b>A1</b><div class="vt-lane"><div class="cl au" style="left:0;width:100%"><i>Musique</i></div></div></div>' +
+      '<div class="vt-head"></div>');
+    var lane = vt.querySelector(".vt-lane"), clips = [].slice.call(vt.querySelectorAll(".cl")), cut = vt.querySelector(".cut"), c4 = vt.querySelector("#vcl4"), head = vt.querySelector(".vt-head");
+    var ruler = vt.querySelector(".vt-ruler"); for (var i = 0; i < 11; i++) ruler.innerHTML += "<span>" + (i < 10 ? "00:0" + i : "00:10") + "</span>";
+    var c = prev.querySelector(".vp-c"), b = prev.querySelector(".vp-b"), rr = prev.querySelector(".vp-r"), sub = prev.querySelector(".vp-sub"), ptc = prev.querySelector(".vp-tc");
+    var LW = 1062;
+    return function (t) {
+      CAM(cam, { z: -200 + t * 24, ry: 6 - t * .9, rx: 2 });
+      T(glow, { o: ramp(t, 0, 1.5) });
+      kin(k, t, .2, .22);
+      var q = ramp(t, .4, 1.4, E.spring); T(prev, { y: (1 - q) * 380, ry: -12, rx: 4, rz: 1.2, z: 40, o: cl(q * 3) });
+      var p2 = ramp(t, .8, 1.8, E.spring); T(vt, { y: (1 - p2) * 520, rx: 8, z: -20, o: cl(p2 * 3) });
+      clips.forEach(function (cl_, i) { var kk = ramp(t, 1.2 + i * .16, 1.9 + i * .16, E.spring); T(cl_, { sx: kk, sy: 1, o: cl(kk * 3) }); });
+      var hd = cl((t - 1.3) / 5.6); // la tête de lecture traverse la table
+      var hx = hd * LW; T(head, { x: hx, o: ramp(t, 1.2, 1.6) });
+      // le morceau « à couper » disparaît, la suite se recolle
+      var cc = ramp(t, 4.3, 5.0, E.io);
+      T(cut, { sx: 1 - cc, o: 1 - cc * .6 }); cut.style.transformOrigin = "0 50%";
+      T(c4, { x: -LW * .16 * cc });
+      // aperçu : le disque suit la lecture, les sous-titres s'écrivent mot à mot
+      T(c, { x: -hd * 160, y: Math.sin(hd * 6) * 18 }); T(b, { rz: -10 + hd * 40, y: -hd * 24 }); T(rr, { x: hd * 120 });
+      var W1 = "On garde ce qui compte".split(" "), W2 = "on coupe le reste.".split(" ");
+      var s = "", n1 = Math.floor(ramp(t, 1.9, 3.7, E.lin) * W1.length), n2 = Math.floor(ramp(t, 4.6, 6.1, E.lin) * W2.length);
+      s = (t < 4.5 ? W1.slice(0, n1) : W2.slice(0, n2)).join(" ");
+      sub.textContent = s; T(sub, { o: s ? 1 : 0 });
+      var fr = Math.round(hd * 8 * 25), sec = Math.floor(fr / 25);
+      ptc.textContent = "00:0" + sec + ":" + (fr % 25 < 10 ? "0" : "") + (fr % 25);
+    };
+  });
+
+  // G · et le reste du digital : profils, visuels, être trouvé
+  scene(function (r, bg, cam) {
+    bg.style.background = "#e8e6e0 radial-gradient(circle at 1px 1px,rgba(14,17,20,.14) 1.4px,transparent 1.6px) 0 0/26px 26px";
+    var k = kw(cam, "g-k stack dk", ["Et on", "s'occupe", "du reste."], 92);
+    var g1 = el(cam, "tile g1", '<div class="g-ban"></div><div class="g-av"><svg viewBox="0 0 40 40"><rect x="8" y="5" width="7" height="30" fill="#f2f1ec"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="#ff5a1f"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="#f2f1ec"/></svg></div><div class="g-nm"></div><div class="g-ln" style="width:62%;top:150px"></div><div class="g-ln" style="width:40%;top:170px"></div><span class="g-fo">Suivre</span><h5>Vos profils</h5>');
+    var g2 = el(cam, "tile g2", '<h5>Vos visuels</h5><div class="g-gr"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><i class="e"></i><i class="f"></i></div>');
+    var g3 = el(cam, "tile g3", '<h5>Être trouvé</h5><div class="g-se"><svg viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="#0e1114" stroke-width="2"/><path d="M13 13l5 5" stroke="#0e1114" stroke-width="2"/></svg><span class="g-q"></span></div><div class="g-rs g-r1"><b></b><u><i>Votre site</i><em>votre-activite.com</em></u><s>Trouvé</s></div><div class="g-rs"><b></b><u><i></i><em></em></u></div><div class="g-rs"><b></b><u><i></i><em></em></u></div>');
+    var tiles = [g1, g2, g3], gi = [].slice.call(g2.querySelectorAll(".g-gr i")), q = g3.querySelector(".g-q"), r1 = g3.querySelector(".g-r1"), fo = g1.querySelector(".g-fo");
+    var rs = [].slice.call(g3.querySelectorAll(".g-rs"));
+    return function (t) {
+      CAM(cam, { z: -240 + t * 34, ry: 14 - t * 3, rx: 5 - t * .4, x: -26 + t * 4 });
+      kin(k, t, .2, .22);
+      tiles.forEach(function (tl, i) { var kk = ramp(t, .4 + i * .3, 1.4 + i * .3, E.spring); T(tl, { z: (1 - kk) * -1000, y: (1 - kk) * 280, ry: (1 - kk) * 34, o: cl(kk * 2.5) }); });
+      gi.forEach(function (g, i) { var kk = ramp(t, 1.4 + i * .18, 2.0 + i * .18, E.spring); T(g, { s: .3 + .7 * kk, o: cl(kk * 3) }); });
+      var f = ramp(t, 2.8, 3.2, E.spring); fo.style.transform = "scale(" + (1 + .08 * Math.sin(Math.min(1, f) * 3.14)) + ")"; fo.classList.toggle("on", t > 3.0);
+      var TX = "votre activité", n = Math.floor(ramp(t, 3.2, 4.8, E.lin) * TX.length);
+      q.textContent = TX.slice(0, n) + (n < TX.length && Math.floor(t * 3) % 2 ? "|" : "");
+      rs.forEach(function (x, i) { var kk = ramp(t, 4.8 + i * .22, 5.4 + i * .22, E.spring); T(x, { y: (1 - kk) * 24, o: cl(kk * 3) }); });
+      r1.classList.toggle("hit", t > 5.7);
+    };
+  });
+
   // Z · carte finale
   scene(function (r, bg, cam) {
     bg.style.background = "var(--rec)";
@@ -273,7 +336,10 @@
     "Vous donnez vos retours, nous corrigeons. Autant de tours que nécessaire, jusqu'à ce que ce soit juste.",
     "Enfin, votre site est mis en ligne, et nous vous expliquons comment le prendre en main.",
     "Un projet ? Parlons-en.",
+    "Nous montons aussi vos vidéos : souvenirs, événements, formats courts pour les réseaux. On garde ce qui compte, on coupe le reste.",
+    "Et nous soignons votre présence en ligne : vos profils, vos visuels, et des conseils concrets pour qu'on vous trouve.",
   ];
+  var VFILE = [1, 2, 3, 4, 5, 7, 8, 6]; // fichier de chaque chapitre ; le dernier (carte finale) est voix-6
   var AC = null, master = null, soundOn = false, musicTimer = 0, musicGain = null, noiseB = null;
   function ac() {
     if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AC = new C(); master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination); }
@@ -331,8 +397,8 @@
 
   // Voix : de vrais enregistrements, un fichier par chapitre (assets/film/voix-1.mp3 … voix-6.mp3).
   // Pas de voix de synthèse. La durée de chaque chapitre s'adapte à celle de l'enregistrement.
-  var VOICE = NARR.map(function (_, i) {
-    var a = new Audio(); a.preload = "metadata"; a.src = "assets/film/voix-" + (i + 1) + ".mp3"; a.ok = false;
+  var VOICE = VFILE.map(function (n) {
+    var a = new Audio(); a.preload = "metadata"; a.src = "assets/film/voix-" + n + ".mp3"; a.ok = false;
     a.addEventListener("loadedmetadata", function () { a.ok = isFinite(a.duration); retime(); });
     return a;
   });
@@ -345,13 +411,13 @@
       START[i] = acc; acc += c.d;
       var li = clipsEl.children[i]; if (li) li.style.setProperty("--d", c.d);
     });
-    BODY = acc; TOTAL = BODY + (VOICE[5].ok ? Math.max(5, VOICE[5].duration + 1.2) : 5);
+    BODY = acc; TOTAL = BODY + (VOICE[CH.length].ok ? Math.max(5, VOICE[CH.length].duration + 1.2) : 5);
     if (!playing) render(t);
   }
   function startAudio() {
     if (!soundOn) return;
     startMusic();
-    var ci = t >= BODY + .4 ? 5 : chapterAt(t), a = VOICE[ci];
+    var ci = t >= BODY + .4 ? CH.length : chapterAt(t), a = VOICE[ci];
     if (a.ok && a.currentTime > 0 && !a.ended) a.play().catch(function () {}); else playVoice(ci, true);
   }
   function stopAudio() { stopMusic(); stopVoices(false); }
@@ -367,6 +433,8 @@
   cue(3, -.3, sfx.swoosh); cue(3, 1.0, sfx.pop); cue(3, 1.45, sfx.pop2); cue(3, 2.3, sfx.swoosh); cue(3, 3.7, sfx.pop); cue(3, 4.55, sfx.tick); cue(3, 5.4, sfx.pop2); cue(3, 5.9, sfx.tick); cue(3, 6.8, sfx.chime);
   cue(4, -.3, sfx.swoosh); cue(4, .2, sfx.swoosh); for (var jj = 0; jj < 14; jj++) cue(4, .5 + jj * .105, sfx.key);
   cue(4, 2.5, sfx.live); cue(4, 4.2, sfx.tick); cue(4, 4.9, sfx.tick);
+  cue(5, -.3, sfx.swoosh); cue(5, .5, sfx.swoosh); [1.2, 1.36, 1.52, 1.68].forEach(function (x) { cue(5, x, sfx.tick); }); [2.0, 2.6, 3.2].forEach(function (x) { cue(5, x, sfx.key); }); cue(5, 4.3, sfx.swoosh); cue(5, 4.9, sfx.pop); cue(5, 6.4, sfx.chime);
+  cue(6, -.3, sfx.swoosh); cue(6, .5, sfx.pop); cue(6, .8, sfx.pop); cue(6, 1.1, sfx.pop); cue(6, 3.0, sfx.pop2); for (var mm = 0; mm < 14; mm++) cue(6, 3.2 + mm * .11, sfx.key); cue(6, 5.8, sfx.chime);
   CUES.push({ end: true, fn: sfx.chime });
 
   // ---------- commandes ----------
@@ -392,7 +460,7 @@
 
   function render(now) {
     t = cl(now, 0, TOTAL);
-    var ci = chapterAt(t), endNow = t >= BODY, si = endNow ? 5 : ci;
+    var ci = chapterAt(t), endNow = t >= BODY, si = endNow ? CH.length : ci;
     scenes.forEach(function (s, i) { s.el.style.display = i === si ? "block" : "none"; });
     scenes[si].draw(endNow ? t - BODY : t - START[ci]);
     var w = wipeScale(t); T(wipe, { s: w }); wipe.style.display = w > .002 ? "block" : "none";
@@ -411,7 +479,7 @@
     var prev = t;
     render(t + Math.min(dt, .1));
     if (soundOn) CUES.forEach(function (c) { var g = cueTime(c); if (g > prev && g <= t) c.fn(); });
-    if (soundOn && prev < BODY + .4 && t >= BODY + .4) playVoice(5, true);
+    if (soundOn && prev < BODY + .4 && t >= BODY + .4) playVoice(CH.length, true);
     if (t >= TOTAL) { pause(); return; }
     raf = requestAnimationFrame(tick);
   }
