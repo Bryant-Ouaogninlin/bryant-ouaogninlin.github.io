@@ -395,16 +395,28 @@
     if (musicGain && AC) { var g = musicGain; g.gain.cancelScheduledValues(AC.currentTime); g.gain.setValueAtTime(g.gain.value, AC.currentTime); g.gain.linearRampToValueAtTime(0, AC.currentTime + .6); setTimeout(function () { try { g.disconnect(); } catch (e) {} }, 800); musicGain = null; }
   }
 
-  // Voix : de vrais enregistrements, un fichier par chapitre (assets/film/voix-1.mp3 … voix-6.mp3).
+  // Voix : de vrais enregistrements, un fichier par chapitre (assets/film/voix-N.mp3, voir VFILE).
   // Pas de voix de synthèse. La durée de chaque chapitre s'adapte à celle de l'enregistrement.
+  // VOICE ne sert qu'à lire les durées. La lecture passe par UN SEUL élément audio (VOX), débloqué par le
+  // premier clic : Safari et les mobiles refusent qu'un autre élément démarre hors d'un geste de l'utilisateur.
   var VOICE = VFILE.map(function (n) {
-    var a = new Audio(); a.preload = "metadata"; a.src = "assets/film/voix-" + n + ".mp3"; a.ok = false;
+    var a = new Audio(); a.preload = "metadata"; a.src = "assets/film/voix-" + n + ".mp3?v=2"; a.ok = false;
     a.addEventListener("loadedmetadata", function () { a.ok = isFinite(a.duration); retime(); });
     return a;
   });
-  VOICE[CH.length].addEventListener("ended", function () { if (playing && soundOn && t >= BODY) setTimeout(function () { if (playing && soundOn && t >= BODY) { var a = VOICE[CH.length + 1]; if (a.ok) { a.currentTime = 0; a.play().catch(function () {}); } } }, 450); });
-  function stopVoices(reset) { VOICE.forEach(function (a) { a.pause(); if (reset) { try { a.currentTime = 0; } catch (e) {} } }); }
-  function playVoice(i, fromStart) { if (!soundOn || !VOICE[i].ok) return; stopVoices(true); var a = VOICE[i]; if (fromStart) a.currentTime = 0; a.play().catch(function () {}); }
+  var VOX = new Audio(), voxIdx = -1;
+  VOX.addEventListener("ended", function () {
+    if (voxIdx !== CH.length) return;
+    setTimeout(function () { if (playing && soundOn && t >= BODY && voxIdx === CH.length) { var i = CH.length + 1; if (VOICE[i].ok) { voxIdx = i; VOX.src = VOICE[i].src; VOX.play().catch(function () {}); } } }, 450);
+  });
+  function stopVoices(reset) { VOX.pause(); if (reset) { try { VOX.currentTime = 0; } catch (e) {} } }
+  function playVoice(i) {
+    if (!soundOn || !VOICE[i].ok) return;
+    VOX.pause();
+    if (voxIdx !== i) { voxIdx = i; VOX.src = VOICE[i].src; }
+    try { VOX.currentTime = 0; } catch (e) {}
+    VOX.play().catch(function () {});
+  }
   function retime() {
     var acc = 0;
     CH.forEach(function (c, i) {
@@ -419,8 +431,8 @@
   function startAudio() {
     if (!soundOn) return;
     startMusic();
-    var ci = t >= BODY + .4 ? CH.length : chapterAt(t), a = VOICE[ci];
-    if (a.ok && a.currentTime > 0 && !a.ended) a.play().catch(function () {}); else playVoice(ci, true);
+    var ci = t >= BODY + .4 ? CH.length : chapterAt(t);
+    if (voxIdx === ci && VOX.currentTime > 0 && !VOX.ended) VOX.play().catch(function () {}); else playVoice(ci);
   }
   function stopAudio() { stopMusic(); stopVoices(false); }
 
@@ -469,7 +481,7 @@
     hud.classList.toggle("dark", hudDark[si] && !(w > .5));
     hTr.textContent = "00:" + fmt(t) + ":" + fmt((t % 1) * 25);
     hBl.textContent = endNow ? "Kinéo" : CH[ci].n + " · " + CH[ci].t;
-    if (ci !== lastCh) { lastCh = ci; capT.textContent = CH[ci].t; capP.textContent = CH[ci].p; if (playing && soundOn && !seeking) playVoice(ci, true); }
+    if (ci !== lastCh) { lastCh = ci; capT.textContent = CH[ci].t; capP.textContent = CH[ci].p; if (playing && soundOn && !seeking) playVoice(ci); }
     clipBtns.forEach(function (b, i) { b.style.setProperty("--p", cl((t - START[i]) / CH[i].d)); if (i === ci) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
     tcEl.textContent = "00:" + fmt(t) + " / 00:" + fmt(TOTAL);
     if (t >= BODY + .4) player.setAttribute("data-end", ""); else player.removeAttribute("data-end");
@@ -481,7 +493,7 @@
     var prev = t;
     render(t + Math.min(dt, .1));
     if (soundOn) CUES.forEach(function (c) { var g = cueTime(c); if (g > prev && g <= t) c.fn(); });
-    if (soundOn && prev < BODY + .4 && t >= BODY + .4) playVoice(CH.length, true);
+    if (soundOn && prev < BODY + .4 && t >= BODY + .4) playVoice(CH.length);
     if (t >= TOTAL) { pause(); return; }
     raf = requestAnimationFrame(tick);
   }
