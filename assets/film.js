@@ -479,6 +479,7 @@
   var t = 0, playing = false, last = 0, raf = 0, lastCh = -1, userPaused = false;
   function chapterAt(x) { var c = 0; for (var i = 0; i < CH.length; i++) if (x >= START[i]) c = i; return c; }
   function fmt(s) { s = Math.floor(s); return (s < 10 ? "0" : "") + s; }
+  function mmss(s) { return fmt(s / 60) + ":" + fmt(s % 60); }
 
   function wipeScale(x) { // disque orange qui change de plan : il grandit juste avant la coupe, puis se retire
     var best = 0;
@@ -496,11 +497,11 @@
     scenes[si].draw(endNow ? t - BODY : t - START[ci]);
     var w = wipeScale(t); T(wipe, { s: w }); wipe.style.display = w > .002 ? "block" : "none";
     hud.classList.toggle("dark", hudDark[si] && !(w > .5));
-    hTr.textContent = "00:" + fmt(t) + ":" + fmt((t % 1) * 25);
+    hTr.textContent = "00:" + mmss(t) + ":" + fmt((t % 1) * 25);
     hBl.textContent = endNow ? "Kinéo" : CH[ci].n + " · " + CH[ci].t;
     if (ci !== lastCh) { lastCh = ci; capT.textContent = CH[ci].t; capP.textContent = CH[ci].p; }
     clipBtns.forEach(function (b, i) { b.style.setProperty("--p", cl((t - START[i]) / CH[i].d)); if (i === ci) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
-    tcEl.textContent = "00:" + fmt(t) + " / 00:" + fmt(TOTAL);
+    tcEl.textContent = mmss(t) + " / " + mmss(TOTAL);
     if (t >= BODY + .4) player.setAttribute("data-end", ""); else player.removeAttribute("data-end");
   }
 
