@@ -290,7 +290,7 @@ footer .wrap{align-items:center}
 .theme .dot[aria-pressed="true"]{border-color:var(--ink);transform:scale(1.18)}
 .theme .arr{background:none;border:1px solid var(--line);color:var(--ink);width:30px;height:30px;cursor:pointer;font-family:var(--f-mono);font-size:1rem;line-height:1;padding:0}
 .theme .arr:hover{border-color:var(--rec);color:var(--rec)}
-@media(max-width:900px){.hero3d{width:100%;max-width:420px;margin:30px auto 0}.hero .wrap{padding-bottom:120px}.theme{flex-wrap:wrap;justify-content:center;bottom:-100px;gap:10px 14px}.theme .arr,.theme .mono:last-of-type{display:none}}
+@media(max-width:900px){.hero3d{width:100%;max-width:420px;margin:30px auto 0}.hero>.wrap{padding-bottom:120px}.theme{flex-wrap:wrap;justify-content:center;bottom:-100px;gap:10px 14px}.theme .arr,.theme .mono:last-of-type{display:none}}
 
 .hero3d canvas{filter:drop-shadow(0 0 26px color-mix(in srgb,var(--rec) 55%,transparent))}
 .hero3d{top:34px}
@@ -371,3 +371,13 @@ body[data-paymode="manual"] [data-only="manual"],body[data-paymode="cinetpay"] [
 .pay-declare select,.pay-declare input{flex:1 1 180px;min-width:0;font-family:var(--f-body);font-size:1rem;padding:13px 14px;background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
 .pay-declare select:focus,.pay-declare input:focus{outline:2px solid var(--rec);outline-offset:2px}
 .pay-declare .btn{margin-top:0}
+/* mentions légales */
+.legal{max-width:760px}
+.legal .toc{display:flex;flex-wrap:wrap;gap:8px 22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.legal .toc a{color:var(--muted);text-decoration:none}.legal .toc a:hover{color:var(--rec)}
+.legal h2{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.025em;line-height:1.1;margin:52px 0 14px;padding-top:18px;border-top:2px solid var(--ink);scroll-margin-top:90px}
+.legal h3{font-family:var(--f-display);font-weight:700;font-size:1.05rem;margin:24px 0 4px}
+.legal p,.legal li{color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.legal p{margin:0 0 12px}.legal ul{padding-left:1.1em;margin:0 0 14px}.legal li{margin-bottom:8px}
+.legal a{color:var(--ink);text-underline-offset:3px}
+@media(min-width:901px){.hero>.wrap{padding-bottom:96px}} /* place pour le sélecteur de teinte sous le K 3D */

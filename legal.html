@@ -3,43 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mentions légales et confidentialité — Kinéo</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
-<style>
-:root{--paper:#0e1114;--ink:#f2f1ec;--rec:#ff5a1f}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:1.15rem;line-height:1.6}
-main{max-width:720px;margin:0 auto;padding:56px 22px 90px}
-h1,h2{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.025em;line-height:1.05}
-h1{font-size:2.6rem;margin:0 0 30px}
-h2{font-size:1.5rem;margin:40px 0 10px;border-top:2px solid var(--ink);padding-top:16px}
-.todo{background:var(--rec);color:#fff;font-family:ui-monospace,monospace;font-size:.75rem;padding:2px 7px;text-transform:uppercase;letter-spacing:.05em}
-a{text-underline-offset:3px}
-</style>
+<title>Mentions légales — Kinéo</title>
+<meta name="description" content="Mentions légales, conditions de prestation et confidentialité de Kinéo.">
+<script>try{localStorage.removeItem("kineoTheme");var _t=JSON.parse(localStorage.getItem("kineoTeinte")||"null");if(_t){var _r=document.documentElement.style;_r.setProperty("--rec",_t.rec);_r.setProperty("--rec-dark",_t.dark);_r.setProperty("--stage",_t.stage)}}catch(e){}</script>
+<link rel="icon" type="image/svg+xml" href="assets/kineo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css?v=30">
 </head>
 <body>
+<div class="playhead" id="playhead" aria-hidden="true"></div>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="Kinéo, accueil"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="8" y="5" width="7" height="30" fill="currentColor"/><polygon points="15,15.05 15,20 19.95,20 30,9.95 25.05,5" fill="var(--rec)"/><polygon points="15,24.95 15,20 19.95,20 30,30.05 25.05,35" fill="currentColor"/></svg><span class="wm">kin<b>é</b>o</span></a>
+    <ul id="menu"><li><a href="index.html">Accueil</a></li><li><a href="services.html">Services</a></li><li><a href="a-propos.html">À propos</a></li><li><a href="contact.html">Contact</a></li></ul>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+    <div class="right" aria-hidden="true"><span class="chap" id="chap">Mentions légales</span><span class="tc" id="tc">00:00:00:00</span></div>
+  </div>
+</header>
 <main>
-<p><a href="index.html">← Retour au site</a></p>
-<h1>Mentions légales et confidentialité</h1>
-<p><span class="todo">Brouillon à valider</span> Les champs marqués « À COMPLÉTER » doivent être renseignés avant publication.</p>
+<section class="phero"><div class="wrap">
+  <span class="mono" data-scramble>Informations légales</span>
+  <h1><span class="w"><span>Mentions</span></span> <span class="w"><span><em>légales.</em></span></span></h1>
+  <p class="lead">Qui nous sommes, comment se déroule une prestation et ce que nous faisons de vos données. Mise à jour : 6 octobre 2026.</p>
+</div></section>
+<section style="padding-top:10px"><div class="wrap legal">
+  <nav class="toc mono" aria-label="Sommaire"><a href="#editeur">Éditeur</a><a href="#prestations">Prestations</a><a href="#paiement">Paiement</a><a href="#propriete">Propriété</a><a href="#donnees">Données</a><a href="#litiges">Litiges</a></nav>
 
-<h2>Éditeur du site</h2>
-<p>Kinéo (groupe), responsable de publication : <span class="todo">À COMPLÉTER : nom d'une personne physique</span>, <span class="todo">À COMPLÉTER : statut (particulier, micro-entrepreneur…), SIRET si existant</span><br>
-Adresse : <span class="todo">À COMPLÉTER</span><br>
-Contact : kineo.digi@gmail.com</p>
+  <h2 id="editeur">Éditeur et hébergement</h2>
+  <p>Le site est édité par <b>Kinéo</b>, activité de création de sites web, de montage vidéo et d'accompagnement digital exercée en Côte d'Ivoire.<br>
+  Contact : <a href="mailto:kineo.digi@gmail.com">kineo.digi@gmail.com</a> · WhatsApp <a href="https://wa.me/2250105483481">+225 01 05 48 34 81</a>.<br>
+  Responsable de la publication : l'équipe Kinéo, joignable aux mêmes coordonnées.</p>
+  <p>Hébergement : GitHub Pages, GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
 
-<h2>Hébergement</h2>
-<p>Site hébergé par GitHub Pages — GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+  <h2 id="prestations">Nos prestations</h2>
+  <h3>Le devis fait foi</h3>
+  <p>Chaque projet fait l'objet d'un devis qui précise ce qui est réalisé, le prix en francs CFA, l'acompte et les délais. Il est valable 30 jours. Ce qui n'y figure pas n'est pas compris dans le prix. Votre accord sur le devis (signature, message écrit ou paiement de l'acompte) vaut acceptation de ces conditions.</p>
+  <h3>Démarrage et acompte</h3>
+  <p>Nous commençons dès réception de l'acompte prévu au devis. Il réserve notre temps et rémunère le travail engagé : une fois la réalisation commencée, il reste acquis à Kinéo.</p>
+  <h3>Vos retours</h3>
+  <p>Les corrections sont comprises tant qu'elles portent sur ce que prévoit le devis. Une demande nouvelle (page, fonction, séquence ou format en plus, changement de direction après validation) fait l'objet d'un complément, chiffré et accepté avant d'être réalisé.</p>
+  <h3>Délais</h3>
+  <p>Les délais sont donnés à titre indicatif. Ils courent à partir de l'acompte et de la réception de vos contenus (textes, photos, vidéos, accès). Tout retard dans ces éléments ou dans vos réponses décale la livraison d'autant.</p>
+  <h3>Validation</h3>
+  <p>Chaque étape vous est présentée pour validation. Sans remarque de votre part dans les 10 jours qui suivent une livraison, et après un rappel de notre part, l'étape est considérée comme validée.</p>
+  <h3>Projet arrêté en cours de route</h3>
+  <p>Si vous arrêtez le projet, le travail réalisé jusque-là reste dû, en plus de l'acompte déjà acquis. Sans nouvelles de votre part pendant 60 jours, le projet est clos ; une reprise fait l'objet d'un nouveau devis.</p>
+  <h3>Vos contenus</h3>
+  <p>Vous nous confiez des textes, images, vidéos, musiques ou logos : vous garantissez avoir le droit de les utiliser et en restez responsable. Nous pouvons refuser un contenu contraire à la loi ou aux droits d'autrui.</p>
+  <h3>Fichiers livrés</h3>
+  <p>Nous livrons les fichiers finaux prévus au devis. Les fichiers de travail (projets de montage, rushes non retenus, fichiers sources de conception) restent chez Kinéo, sauf mention contraire au devis. Nous conservons vos fichiers 3 mois après la livraison : pensez à garder une copie de ce que nous vous remettons.</p>
+  <h3>Services extérieurs</h3>
+  <p>Nom de domaine, hébergement, abonnements, publicités payantes et plateformes (Meta, TikTok, Google…) sont facturés en plus, sauf mention au devis, et restent soumis aux conditions de ces services. Kinéo ne répond pas de leurs pannes, de leurs changements de règles ni de la suspension d'un compte par ces plateformes.</p>
+  <h3>Visibilité et résultats</h3>
+  <p>Nous mettons notre savoir-faire au service de votre visibilité, mais l'audience, le référencement, les abonnés ou les ventes dépendent aussi de facteurs que personne ne contrôle : ils ne peuvent pas être garantis.</p>
+  <h3>Responsabilité</h3>
+  <p>Hors faute lourde ou intentionnelle, la responsabilité de Kinéo est limitée au montant payé pour la prestation concernée et ne couvre pas les pertes indirectes (manque à gagner, perte de clientèle ou de données).</p>
+  <h3>Rétractation</h3>
+  <p>Lorsque la loi vous accorde un délai de rétractation, il s'applique. Si vous nous demandez de commencer avant la fin de ce délai, le travail réalisé à la date de votre rétractation reste dû.</p>
 
-<h2>Données personnelles</h2>
-<p>Ce site n'utilise pas de formulaire, pas de cookie de suivi ni d'outil de statistiques. Les seules données que nous recevons sont celles que vous nous envoyez vous-même par e-mail ou message, pour répondre à votre demande de projet.</p>
-<p>Finalité : répondre à votre demande et, si vous donnez suite, réaliser la prestation. Durée de conservation : <span class="todo">À COMPLÉTER : ex. 3 ans après le dernier échange</span>. Vos données ne sont ni vendues ni transmises à des tiers.</p>
-<p>Vous pouvez demander l'accès, la rectification ou la suppression de vos données en écrivant à l'adresse de contact ci-dessus.</p>
+  <h2 id="paiement">Paiement</h2>
+  <p>Les prix sont en francs CFA (FCFA). Le paiement se fait avec les moyens indiqués sur votre lien de paiement (Mobile Money, virement, carte via CinetPay). Le solde est dû à la livraison : la mise en ligne définitive et la remise des fichiers finaux, sans filigrane, interviennent après paiement complet. En cas de retard de paiement, le travail en cours est suspendu jusqu'au règlement.</p>
+  <p>Kinéo ne vous demandera jamais votre code secret, un code reçu par SMS ni votre numéro de carte.</p>
 
-<h2>Polices</h2>
-<p>Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet votre adresse IP à Google lors de l'affichage de la page.</p>
+  <h2 id="propriete">Propriété intellectuelle</h2>
+  <p>Les contenus de ce site (textes, visuels, animations, vidéos, logo) appartiennent à Kinéo. Toute reproduction sans notre accord écrit est interdite.</p>
+  <p>Pour vos réalisations : une fois la prestation entièrement payée, vous pouvez utiliser librement les fichiers livrés pour vos besoins personnels et professionnels, sans limite de durée ni de lieu. Jusqu'au paiement complet, Kinéo en conserve tous les droits. Kinéo garde ses méthodes, ses outils et les éléments génériques qu'elle a développés, et peut les réutiliser.</p>
+  <p>Nous pouvons présenter votre projet (captures, extraits) parmi nos réalisations et sur nos réseaux, et une mention discrète « Réalisé par Kinéo » peut figurer sur votre site. Il suffit d'un message pour que nous retirions l'un ou l'autre.</p>
 
-<h2>Propriété intellectuelle</h2>
-<p>Les contenus du site (textes, visuels, vidéos) sont la propriété de leur auteur sauf mention contraire. <span class="todo">À COMPLÉTER : conditions de réutilisation</span></p>
+  <h2 id="donnees">Données personnelles</h2>
+  <p>Nous traitons vos données dans le respect de la loi ivoirienne n° 2013-450 du 19 juin 2013 relative à la protection des données à caractère personnel.</p>
+  <ul>
+    <li><b>Ce que nous recevons :</b> uniquement ce que vous nous envoyez (nom, numéro, e-mail, messages, fichiers) et les informations liées à vos paiements.</li>
+    <li><b>Pourquoi :</b> répondre à votre demande, établir le devis, réaliser la prestation, la facturer et assurer le suivi.</li>
+    <li><b>Avec qui :</b> nos prestataires techniques, uniquement pour ces besoins : messagerie (WhatsApp, e-mail), paiement (CinetPay et opérateurs Mobile Money), hébergement. Vos messages WhatsApp peuvent d'abord être pris en charge par un assistant automatisé qui enregistre votre demande et la transmet à l'équipe. Vos données ne sont jamais vendues.</li>
+    <li><b>Combien de temps :</b> 3 ans après notre dernier échange ; les factures sont conservées pendant la durée imposée par la réglementation comptable.</li>
+    <li><b>Vos droits :</b> accès, rectification, opposition et suppression, par simple message à <a href="mailto:kineo.digi@gmail.com">kineo.digi@gmail.com</a>. Vous pouvez aussi saisir l'ARTCI, autorité ivoirienne de protection des données.</li>
+  </ul>
+  <p>Ce site n'utilise ni cookie publicitaire, ni outil de statistiques, ni formulaire. Il mémorise seulement dans votre navigateur si vous avez déjà vu l'introduction animée. Les polices de caractères sont chargées depuis Google Fonts, ce qui transmet votre adresse IP à Google.</p>
+
+  <h2 id="litiges">Litiges et droit applicable</h2>
+  <p>Ces conditions sont soumises au droit ivoirien. En cas de désaccord, écrivez-nous d'abord : nous cherchons toujours une solution à l'amiable. À défaut, le litige sera porté devant les juridictions d'Abidjan, sauf règle légale contraire.</p>
+  <p>Kinéo peut faire évoluer ces conditions. La version applicable à votre projet est celle en vigueur à la date de votre devis.</p>
+</div></section>
 </main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Kinéo · <a href="mailto:kineo.digi@gmail.com">kineo.digi@gmail.com</a></span>
+    <span><a href="https://wa.me/2250105483481?text=Bonjour%20Kin%C3%A9o%2C%20j%27ai%20un%20projet." target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.instagram.com/kineo.digital" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.tiktok.com/@cherklaw" target="_blank" rel="noopener">TikTok</a> · <a href="legal.html">Mentions légales &amp; confidentialité</a></span>
+  </div>
+</footer>
+<script src="assets/site.js?v=26"></script>
+<script src="assets/fx.js?v=27"></script>
 </body>
 </html>
