@@ -26,3 +26,12 @@ Les fichiers voix-1 à voix-6 sont déjà en place. Sans voix-7 et voix-8, ces d
 
 CONCLUSION (carte finale, après « Un projet ? Parlons-en. »)
   voix-9.mp3   « Alors, qu'attendez-vous pour bondir sur Kinéo ? » (avec le rire)
+
+
+CHANGEMENT DE VOIX : fin du film en voix de femme
+Ordre de lecture : voix-1, 2, 3, 4, 5, 7 (voix principale), puis la voix de femme sur les trois derniers passages :
+  voix-8.mp3   (chapitre « présence en ligne »)
+  voix-6.mp3   (« Un projet ? Parlons-en. »)
+  voix-9.mp3   (conclusion avec le rire)
+À enregistrer avec la même voix, dans la même pièce et avec le même micro, pour que les trois passages sonnent d'un seul tenant.
+Remplacez simplement les fichiers existants (mêmes noms) : aucun changement de code n'est nécessaire.
