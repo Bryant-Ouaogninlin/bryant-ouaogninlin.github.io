@@ -1,17 +1,17 @@
-// Teintes du site : une pastille change la couleur d'accent partout, le fond du hero (balayage circulaire) et le K en 3D
+// Teintes du site (couleurs chaudes) : une pastille change la couleur d'accent partout, le fond du hero (balayage circulaire) et le K en 3D
 (function(){
   var root=document.documentElement, hero=document.querySelector('.hero'), box=document.querySelector('.theme');
   if(!hero||!box) return;
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   var TH=[
     {n:'Orange',  rec:'#ff5a1f',dark:'#c2410c',stage:'#32140a'},
-    {n:'Cobalt',  rec:'#1f8fff',dark:'#0b5fcf',stage:'#08224a'},
-    {n:'Émeraude',rec:'#19c98c',dark:'#0b8a5e',stage:'#06302a'},
-    {n:'Ambre',   rec:'#ffbf2e',dark:'#9a6a00',stage:'#33260a'}
+    {n:'Rouge',   rec:'#ef3340',dark:'#a3111c',stage:'#330a0d'},
+    {n:'Jaune',   rec:'#ffc21a',dark:'#946600',stage:'#33270a'},
+    {n:'Rose',    rec:'#ff4f8b',dark:'#b0164f',stage:'#330b1c'}
   ];
   var dots=[].slice.call(box.querySelectorAll('.dot')), nameEl=document.getElementById('tname'), numEl=document.getElementById('tnum');
   var cur=0, busy=false, touched=false;
-  try{var saved=JSON.parse(localStorage.getItem('kineoTheme')||'null'); if(saved&&typeof saved.i==='number'){cur=saved.i;touched=true}}catch(e){}
+  try{var saved=JSON.parse(localStorage.getItem('kineoTeinte')||'null'); if(saved&&typeof saved.i==='number'){cur=saved.i;touched=true}}catch(e){}
   function ui(i){dots.forEach(function(d,k){d.setAttribute('aria-pressed',k===i?'true':'false')}); nameEl.textContent=TH[i].n; numEl.textContent='0'+(i+1)}
   function bg(c){return 'linear-gradient(165deg,'+c+' 0%,#0e1114 60%)'}
   function apply(i,from,manual){
@@ -21,7 +21,7 @@
     cur=i; ui(i);
     root.style.setProperty('--rec',t.rec); root.style.setProperty('--rec-dark',t.dark);
     document.dispatchEvent(new CustomEvent('kineo:theme',{detail:t}));
-    if(manual){try{localStorage.setItem('kineoTheme',JSON.stringify({i:i,rec:t.rec,dark:t.dark,stage:t.stage}))}catch(e){}}
+    if(manual){try{localStorage.setItem('kineoTeinte',JSON.stringify({i:i,rec:t.rec,dark:t.dark,stage:t.stage}))}catch(e){}}
     if(reduce||!hero.animate){root.style.setProperty('--stage',t.stage);return}
     // balayage circulaire du nouveau fond depuis la pastille
     var w=document.createElement('div'); w.className='wipe'; w.style.background=bg(t.stage); hero.insertBefore(w,hero.firstChild.nextSibling);

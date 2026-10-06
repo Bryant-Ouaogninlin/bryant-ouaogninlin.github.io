@@ -24,19 +24,15 @@
 
   if(reduce||!fine) return;
 
-  // 2) Anneau de curseur + coordonnées
+  // 2) Anneau de curseur
   var ring=document.createElement('div'); ring.className='cur'; ring.setAttribute('aria-hidden','true');
-  var pos=document.createElement('div'); pos.className='pos'; pos.setAttribute('aria-hidden','true');
-  document.body.appendChild(ring); document.body.appendChild(pos);
+  document.body.appendChild(ring);
   var mx=-100,my=-100,rx=-100,ry=-100,seen=false;
-  addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;if(!seen){seen=true;ring.classList.add('on');pos.classList.add('on')}},{passive:true});
+  addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;if(!seen){seen=true;ring.classList.add('on')}},{passive:true});
   document.addEventListener('mouseover',function(e){var t=e.target.closest&&e.target.closest('a,button,.btn');ring.classList.toggle('big',!!t)});
-  function pad(n,l){n=String(n);while(n.length<l)n='0'+n;return n}
   (function loop(){
     rx+=(mx-rx)*.18; ry+=(my-ry)*.18;
     ring.style.transform='translate('+(rx-16)+'px,'+(ry-16)+'px)';
-    var max=document.documentElement.scrollHeight-innerHeight, p=max>0?Math.round(scrollY/max*100):0;
-    pos.textContent='X '+pad(Math.max(0,Math.round(mx)),4)+'  Y '+pad(Math.max(0,Math.round(my)),4)+'  SCROLL '+pad(p,3)+'%';
     requestAnimationFrame(loop);
   })();
 
