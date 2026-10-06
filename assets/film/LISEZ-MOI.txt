@@ -35,3 +35,11 @@ Ordre de lecture : voix-1, 2, 3, 4, 5, 7 (voix principale), puis la voix de femm
   voix-9.mp3   (conclusion avec le rire)
 À enregistrer avec la même voix, dans la même pièce et avec le même micro, pour que les trois passages sonnent d'un seul tenant.
 Remplacez simplement les fichiers existants (mêmes noms) : aucun changement de code n'est nécessaire.
+
+
+IMPORTANT : REMPLACER UN FICHIER VOIX
+Le montage est calé sur la durée exacte de chaque voix. Après avoir remplacé un MP3 :
+1. Relevez sa durée en secondes (deux décimales).
+2. Reportez-la dans assets/film.js, tableau VDUR, dans l'ordre de lecture : voix-1, 2, 3, 4, 5, 7, 8, 6, 9.
+3. Augmentez le numéro « ?v= » de vUrl() dans le même fichier, pour que les navigateurs ne rejouent pas l'ancien MP3.
+(La durée est aussi relue sur le fichier au moment de la lecture, mais le tableau garde le film juste même sans son.)
