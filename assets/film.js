@@ -340,9 +340,15 @@
     "Et nous soignons votre présence en ligne : vos profils, vos visuels, et des conseils concrets pour qu'on vous trouve.",
   ];
   var VFILE = [1, 2, 3, 4, 5, 7, 8, 6, 9]; // fichier de chaque chapitre ; carte finale : voix-6 puis la conclusion voix-9
-  var AC = null, master = null, soundOn = false, musicTimer = 0, musicGain = null, noiseB = null;
+  var AC = null, master = null, voiceGain = null, soundOn = false, musicTimer = 0, musicGain = null, noiseB = null;
   function ac() {
-    if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AC = new C(); master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination); }
+    if (!AC) {
+      var C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {} // iPhone : sonne aussi en mode silencieux
+      AC = new C(); master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination);
+      voiceGain = AC.createGain(); voiceGain.gain.value = 1; voiceGain.connect(AC.destination);
+      AC.onstatechange = function () { if (playing) scheduleVoices(); }; // reprise après une coupure (appel, autre onglet…)
+    }
     if (AC.state === "suspended") AC.resume();
     return AC;
   }
@@ -395,46 +401,57 @@
     if (musicGain && AC) { var g = musicGain; g.gain.cancelScheduledValues(AC.currentTime); g.gain.setValueAtTime(g.gain.value, AC.currentTime); g.gain.linearRampToValueAtTime(0, AC.currentTime + .6); setTimeout(function () { try { g.disconnect(); } catch (e) {} }, 800); musicGain = null; }
   }
 
-  // Voix : de vrais enregistrements, un fichier par chapitre (assets/film/voix-N.mp3, voir VFILE).
-  // Pas de voix de synthèse. La durée de chaque chapitre s'adapte à celle de l'enregistrement.
-  // VOICE ne sert qu'à lire les durées. La lecture passe par UN SEUL élément audio (VOX), débloqué par le
-  // premier clic : Safari et les mobiles refusent qu'un autre élément démarre hors d'un geste de l'utilisateur.
-  var VOICE = VFILE.map(function (n) {
-    var a = new Audio(); a.preload = "metadata"; a.src = "assets/film/voix-" + n + ".mp3?v=2"; a.ok = false;
-    a.addEventListener("loadedmetadata", function () { a.ok = isFinite(a.duration); retime(); });
-    return a;
-  });
-  var VOX = new Audio(), voxIdx = -1;
-  VOX.addEventListener("ended", function () {
-    if (voxIdx !== CH.length) return;
-    setTimeout(function () { if (playing && soundOn && t >= BODY && voxIdx === CH.length) { var i = CH.length + 1; if (VOICE[i].ok) { voxIdx = i; VOX.src = VOICE[i].src; VOX.play().catch(function () {}); } } }, 450);
-  });
-  function stopVoices(reset) { VOX.pause(); if (reset) { try { VOX.currentTime = 0; } catch (e) {} } }
-  function playVoice(i) {
-    if (!soundOn || !VOICE[i].ok) return;
-    VOX.pause();
-    if (voxIdx !== i) { voxIdx = i; VOX.src = VOICE[i].src; }
-    try { VOX.currentTime = 0; } catch (e) {}
-    VOX.play().catch(function () {});
+  // Voix : de vrais enregistrements (assets/film/voix-N.mp3, ordre dans VFILE), pas de voix de synthèse.
+  // Elles sont décodées une fois en mémoire puis programmées sur l'horloge audio, aux instants exacts du montage :
+  // l'image suit cette même horloge, donc voix et visuel ne peuvent pas se décaler, sur aucun navigateur.
+  // VDUR : durées des fichiers (s). Le montage en dépend même sans son ; elles sont relues sur les fichiers décodés.
+  // Si vous remplacez un MP3, mettez sa durée à jour ici.
+  var VDUR = [6.43, 6.53, 5.25, 5.72, 4.60, 9.17, 6.27, 1.80, 2.85];
+  var VLEAD = .3, VTAIL = .8, VGAP = .45; // voix 0,3 s après le début du plan ; 0,8 s d'air après ; 0,45 s entre voix-6 et voix-9
+  var VAT = [];                          // instant de départ de chaque voix dans le film
+  var VBUF = null, vRaw = null, vLoad = null, VSRC = [], anchor = 0;
+  function vUrl(n) { return "assets/film/voix-" + n + ".mp3?v=3"; }
+  function prefetchVoices() { // téléchargement seul (pas besoin de clic) : le son est prêt quand on l'active
+    if (!vRaw) vRaw = Promise.all(VFILE.map(function (n) {
+      return fetch(vUrl(n)).then(function (r) { if (!r.ok) throw r.status; return r.arrayBuffer(); }).catch(function () { return null; });
+    }));
+    return vRaw;
+  }
+  function loadVoices() {
+    if (!vLoad) vLoad = prefetchVoices().then(function (raws) {
+      return Promise.all(raws.map(function (buf) {
+        return new Promise(function (res) { if (!buf) return res(null); try { AC.decodeAudioData(buf, res, function () { res(null); }); } catch (e) { res(null); } });
+      }));
+    }).then(function (bufs) { VBUF = bufs; bufs.forEach(function (b, k) { if (b) VDUR[k] = b.duration; }); retime(); });
+    return vLoad;
+  }
+  function stopVoices() { VSRC.forEach(function (s) { try { s.stop(); } catch (e) {} }); VSRC = []; }
+  function clockOn() { return soundOn && VBUF && AC && AC.state === "running"; }
+  function scheduleVoices() { // (re)programme toutes les voix à venir à partir de l'instant t du film
+    stopVoices();
+    if (!playing || !clockOn()) return;
+    var now = AC.currentTime; anchor = now - t;
+    VBUF.forEach(function (buf, k) {
+      if (!buf || VAT[k] + buf.duration <= t) return;
+      var when = anchor + VAT[k], off = 0;
+      if (when < now) { off = now - when; when = now; }
+      var s = AC.createBufferSource(); s.buffer = buf; s.connect(voiceGain); s.start(when, off); VSRC.push(s);
+    });
   }
   function retime() {
     var acc = 0;
     CH.forEach(function (c, i) {
-      c.d = Math.max(c.d0, VOICE[i].ok ? Math.ceil((VOICE[i].duration + .8) * 2) / 2 : 0);
-      START[i] = acc; acc += c.d;
+      c.d = Math.max(c.d0, Math.ceil((VLEAD + VDUR[i] + VTAIL) * 2) / 2);
+      START[i] = acc; VAT[i] = acc + VLEAD; acc += c.d;
       var li = clipsEl.children[i]; if (li) li.style.setProperty("--d", c.d);
     });
-    var e1 = VOICE[CH.length], e2 = VOICE[CH.length + 1];
-    BODY = acc; TOTAL = BODY + Math.max(5, (e1.ok ? e1.duration + .5 : 0) + (e2.ok ? e2.duration : 0) + 1.2);
-    if (!playing) render(t);
+    BODY = acc;
+    VAT[CH.length] = BODY + .4; VAT[CH.length + 1] = VAT[CH.length] + VDUR[CH.length] + VGAP;
+    TOTAL = Math.max(BODY + 5, VAT[CH.length + 1] + VDUR[CH.length + 1] + 1.2);
+    if (playing) scheduleVoices(); else render(t);
   }
-  function startAudio() {
-    if (!soundOn) return;
-    startMusic();
-    var ci = t >= BODY + .4 ? CH.length : chapterAt(t);
-    if (voxIdx === ci && VOX.currentTime > 0 && !VOX.ended) VOX.play().catch(function () {}); else playVoice(ci);
-  }
-  function stopAudio() { stopMusic(); stopVoices(false); }
+  function startAudio() { if (soundOn) { startMusic(); scheduleVoices(); } }
+  function stopAudio() { stopMusic(); stopVoices(); }
 
   var CUES = [];
   function cue(ch, local, fn) { CUES.push({ ch: ch, l: local, fn: fn }); }
@@ -459,7 +476,7 @@
     return li.firstChild;
   });
 
-  var seeking = false, t = 0, playing = false, last = 0, raf = 0, lastCh = -1, userPaused = false;
+  var t = 0, playing = false, last = 0, raf = 0, lastCh = -1, userPaused = false;
   function chapterAt(x) { var c = 0; for (var i = 0; i < CH.length; i++) if (x >= START[i]) c = i; return c; }
   function fmt(s) { s = Math.floor(s); return (s < 10 ? "0" : "") + s; }
 
@@ -481,7 +498,7 @@
     hud.classList.toggle("dark", hudDark[si] && !(w > .5));
     hTr.textContent = "00:" + fmt(t) + ":" + fmt((t % 1) * 25);
     hBl.textContent = endNow ? "Kinéo" : CH[ci].n + " · " + CH[ci].t;
-    if (ci !== lastCh) { lastCh = ci; capT.textContent = CH[ci].t; capP.textContent = CH[ci].p; if (playing && soundOn && !seeking) playVoice(ci); }
+    if (ci !== lastCh) { lastCh = ci; capT.textContent = CH[ci].t; capP.textContent = CH[ci].p; }
     clipBtns.forEach(function (b, i) { b.style.setProperty("--p", cl((t - START[i]) / CH[i].d)); if (i === ci) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
     tcEl.textContent = "00:" + fmt(t) + " / 00:" + fmt(TOTAL);
     if (t >= BODY + .4) player.setAttribute("data-end", ""); else player.removeAttribute("data-end");
@@ -491,9 +508,8 @@
     if (!playing) return;
     var dt = (ts - last) / 1000; last = ts;
     var prev = t;
-    render(t + Math.min(dt, .1));
-    if (soundOn) CUES.forEach(function (c) { var g = cueTime(c); if (g > prev && g <= t) c.fn(); });
-    if (soundOn && prev < BODY + .4 && t >= BODY + .4) playVoice(CH.length);
+    render(clockOn() ? AC.currentTime - anchor : t + Math.min(dt, .1)); // avec le son, l'image suit l'horloge des voix
+    if (soundOn && t - prev < .3) CUES.forEach(function (c) { var g = cueTime(c); if (g > prev && g <= t) c.fn(); });
     if (t >= TOTAL) { pause(); return; }
     raf = requestAnimationFrame(tick);
   }
@@ -504,7 +520,7 @@
     startAudio();
   }
   function pause() { playing = false; player.removeAttribute("data-playing"); pp.setAttribute("aria-label", "Lire"); cancelAnimationFrame(raf); stopAudio(); }
-  function seek(i) { seeking = true; stopVoices(true); render(reduce && !playing ? START[i] + CH[i].d - .01 : START[i] + .001); seeking = false; }
+  function seek(i) { render(reduce && !playing ? START[i] + CH[i].d - .01 : START[i] + .001); if (playing) scheduleVoices(); }
 
   pp.addEventListener("click", function () { if (playing) { userPaused = true; pause(); } else { userPaused = false; play(); } });
   clipsEl.addEventListener("click", function (e) {
@@ -517,7 +533,8 @@
     if (!soundOn) {
       if (!ac()) return;
       soundOn = true; snd.setAttribute("aria-pressed", "true"); player.setAttribute("data-sound", "");
-      seek(chapterAt(t)); userPaused = false; if (playing) pause(); play();
+      if (playing) pause(); seek(chapterAt(t)); userPaused = false;
+      if (VBUF) play(); else loadVoices().then(function () { if (soundOn && !userPaused && !playing) play(); });
     } else { soundOn = false; snd.setAttribute("aria-pressed", "false"); player.removeAttribute("data-sound"); stopAudio(); }
   });
   var replay = document.getElementById("freplay");
@@ -530,7 +547,14 @@
   var m = /[?&]film=([\d.]+)/.exec(location.search); // image figée : ?film=12.5
   if (m) { render(+m[1]); return; }
 
+  retime();
   render(reduce ? CH[0].d - .01 : 0);
+  if ("fetch" in window) setTimeout(prefetchVoices, 1500);
+  var hiddenPause = false; // onglet caché : on met en pause (sinon l'horloge audio continue sans l'image)
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { if (playing) { hiddenPause = true; pause(); } }
+    else if (hiddenPause) { hiddenPause = false; if (!userPaused) play(); }
+  });
 
   if ("IntersectionObserver" in window && !reduce) {
     new IntersectionObserver(function (es) {
