@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#17120f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Contact">
+<meta name="robots" content="noindex">
+<title>Contact — le jeu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff7a1a'/%3E%3Ctext x='32' y='46' font-family='Arial' font-weight='900' font-size='40' text-anchor='middle' fill='%2317120f'%3EC%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #17120f;
+  --panel: #231c17;
+  --panel-2: #2e251f;
+  --line: #3d322a;
+  --text: #f6efe8;
+  --muted: #b3a497;
+  --accent: #ff7a1a;
+  --accent-ink: #1b1108;
+  --good: #3ecf8e;
+  --bad: #ff5d5d;
+  --warn: #ffc247;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.45;
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+  touch-action: manipulation;
+}
+#app {
+  max-width: 480px;
+  min-height: 100%;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+h1, h2, p { margin: 0; }
+h1 { font-size: 30px; line-height: 1.1; letter-spacing: -.01em; }
+h2 { font-size: 22px; line-height: 1.2; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.center { text-align: center; }
+.grow { flex: 1; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; }
+.between { justify-content: space-between; }
+
+.btn {
+  appearance: none; border: 0; cursor: pointer;
+  font: inherit; font-weight: 700; color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 15px 18px;
+  min-height: 54px;
+  width: 100%;
+  transition: transform .08s ease, filter .08s ease;
+}
+.btn:active { transform: scale(.97); filter: brightness(1.15); }
+.btn[disabled] { opacity: .4; pointer-events: none; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.btn.good { background: var(--good); color: #06281a; border-color: transparent; }
+.btn.bad { background: var(--bad); color: #2b0606; border-color: transparent; }
+.btn.ghost { background: transparent; }
+.btn.slim { min-height: 44px; padding: 10px 14px; font-size: 15px; width: auto; }
+.btn.huge {
+  min-height: 120px; font-size: 34px; font-weight: 900; letter-spacing: .04em;
+  border-radius: 28px;
+  box-shadow: 0 10px 0 #b9500a, 0 18px 40px rgba(255,122,26,.25);
+}
+.btn.huge:active { transform: translateY(8px); box-shadow: 0 2px 0 #b9500a; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 16px;
+}
+.tag {
+  display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent);
+}
+
+/* Accueil */
+.logo {
+  font-size: 58px; font-weight: 900; letter-spacing: -.03em; line-height: 1;
+}
+.logo span { color: var(--accent); }
+.hero { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+
+/* Joueurs */
+.player-row { display: flex; gap: 8px; }
+input[type=text] {
+  font: inherit; color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 14px;
+  width: 100%; min-width: 0;
+  -webkit-user-select: text; user-select: text;
+  outline: none;
+}
+input[type=text]:focus { border-color: var(--accent); }
+.icon-btn {
+  flex: none; width: 50px; border-radius: 14px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  color: var(--muted); font-size: 22px; cursor: pointer;
+}
+input.secret { font-size: 24px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+input.secret.masked { -webkit-text-security: disc; }
+
+/* Plateau */
+.letters {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  padding: 8px 0;
+}
+.tile {
+  width: 52px; height: 64px; border-radius: 14px;
+  display: grid; place-items: center;
+  font-size: 34px; font-weight: 900;
+  background: var(--text); color: var(--bg);
+}
+.tile.new { animation: pop .45s cubic-bezier(.2,1.6,.4,1); background: var(--accent); }
+.tile.more { background: transparent; border: 2px dashed var(--line); color: var(--muted); }
+@keyframes pop { from { transform: scale(.2) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 6px; text-align: center; }
+.stat b { display: block; font-size: 22px; }
+.stat span { font-size: 12px; color: var(--muted); }
+.peek { color: var(--warn); border-style: dashed; }
+
+/* Décompte */
+.count-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+.count-num { font-size: 190px; font-weight: 900; line-height: 1; color: var(--accent); animation: beat .9s ease-out; }
+.count-num.go { font-size: 64px; color: var(--good); text-align: center; }
+@keyframes beat { from { transform: scale(1.7); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); } }
+
+/* Scores */
+.score-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.score-row:last-child { border-bottom: 0; }
+.score-row b { font-size: 20px; }
+.crown { color: var(--warn); }
+.pick { display: flex; flex-direction: column; gap: 8px; }
+.pick .btn.on { background: var(--good); color: #06281a; border-color: transparent; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  background: var(--text); color: var(--bg); font-weight: 700;
+  padding: 12px 18px; border-radius: 999px; max-width: 90vw; text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  animation: toast-in .25s ease-out; z-index: 10;
+}
+@keyframes toast-in { from { transform: translate(-50%, 20px); opacity: 0; } }
+ol.rules { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
+ol.rules b { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function () {
+  'use strict';
+
+  var STORE_KEY = 'jeu-contact-v1';
+  var MIN_PLAYERS = 3, MAX_PLAYERS = 10;
+  var WORDS = ['MOUTON','FAUTEUIL','CANAPE','BOUTEILLE','CHAPEAU','FENETRE','GUITARE','MONTAGNE','PARAPLUIE','VALISE',
+    'ORANGE','PIRATE','JARDIN','CHATEAU','LUNETTES','BALLON','CITRON','DRAGON','ECOLE','FROMAGE','GIRAFE','HORLOGE',
+    'ILE','JUNGLE','KOALA','LAPIN','MIROIR','NUAGE','OREILLER','PAPILLON','QUICHE','RIVIERE','SERPENT','TAMBOUR',
+    'USINE','VOITURE','WAGON','ZEBRE','BANANE','CAMION','DENTISTE','ESCALIER','FUSEE','GATEAU','HIBOU','MARCHE',
+    'POISSON','ROBOT','SOLEIL','TORTUE','BOULANGER','CRAYON','MOUSTIQUE','PLAGE','TELEPHONE','VOLCAN','CUISINE',
+    'MARTEAU','PYRAMIDE','TROMPETTE'];
+
+  var app = document.getElementById('app');
+
+  // ---------- État ----------
+  var S = {
+    screen: 'home',
+    players: [],        // { name, score }
+    leader: 0,
+    round: 0,
+    word: '',
+    revealed: 1,
+    stats: { ok: 0, ko: 0, block: 0 },
+    justRevealed: false,
+    outcome: '',        // 'found' | 'revealed' | 'abandon'
+    finders: [],
+    draftNames: ['', '', ''],
+    masked: true,
+    countStep: 3
+  };
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ players: S.players, leader: S.leader, round: S.round }));
+    } catch (e) { /* stockage indisponible : on joue sans sauvegarde */ }
+  }
+  function load() {
+    try {
+      var d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (d && Array.isArray(d.players) && d.players.length >= MIN_PLAYERS) {
+        S.players = d.players.map(function (p) { return { name: String(p.name), score: Number(p.score) || 0 }; });
+        S.leader = Math.min(Number(d.leader) || 0, S.players.length - 1);
+        S.round = Number(d.round) || 0;
+      }
+    } catch (e) { /* rien à reprendre */ }
+  }
+
+  // ---------- Utilitaires ----------
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function cleanWord(raw) {
+    return String(raw).toUpperCase()
+      .replace(/Œ/g, 'OE').replace(/Æ/g, 'AE')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^A-Z]/g, '');
+  }
+  function leaderName() { return S.players[S.leader].name; }
+  function prefix() { return S.word.slice(0, S.revealed); }
+
+  var audio = null;
+  function beep(freq, ms) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+      var o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.18, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + ms / 1000);
+      o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + ms / 1000);
+    } catch (e) { /* pas de son : le jeu continue */ }
+  }
+  function buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var old = document.querySelector('.toast');
+    if (old) old.remove();
+    var t = document.createElement('div');
+    t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg;
+    document.body.appendChild(t);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.remove(); }, 2200);
+  }
+
+  var countTimers = [];
+  function clearCount() { countTimers.forEach(clearTimeout); countTimers = []; }
+
+  // ---------- Écrans ----------
+  var screens = {
+    home: function () {
+      var resume = S.players.length >= MIN_PLAYERS;
+      return '<div class="hero center">' +
+          '<div class="tag">Jeu de mots à voix haute</div>' +
+          '<div class="logo">CON<span>TACT</span></div>' +
+          '<p class="muted">Un meneur, un mot secret, une lettre à la fois.<br>3 joueurs ou plus, un seul téléphone.</p>' +
+        '</div>' +
+        '<div class="stack">' +
+          (resume ? '<button class="btn primary" data-a="resume">Continuer la partie</button>' : '') +
+          '<button class="btn ' + (resume ? '' : 'primary') + '" data-a="new">Nouvelle partie</button>' +
+          '<button class="btn ghost" data-a="rules">Règles du jeu</button>' +
+        '</div>';
+    },
+
+    rules: function () {
+      return '<div class="tag">Règles</div><h1>Comment jouer</h1>' +
+        '<div class="card"><ol class="rules">' +
+          '<li>Le <b>meneur</b> choisit un mot secret et n’en montre que la <b>première lettre</b>.</li>' +
+          '<li>Les autres pensent à un mot qui commence par les lettres affichées et donnent un <b>indice</b> sans jamais dire le mot. Exemple pour « M » : « on s’assoit dessus » (meuble).</li>' +
+          '<li>Un joueur qui croit avoir compris crie <b>« Contact ! »</b> et appuie sur le bouton : décompte 3, 2, 1, puis les deux disent leur mot <b>en même temps</b>.</li>' +
+          '<li><b>Même mot</b> : contact réussi, le meneur dévoile la <b>lettre suivante</b>.</li>' +
+          '<li><b>Mots différents</b> : contact raté, pas de lettre.</li>' +
+          '<li>Le meneur peut <b>bloquer</b> : s’il devine le mot de l’indice et le dit avant la fin du décompte, le contact est annulé.</li>' +
+          '<li>La manche s’arrête quand quelqu’un trouve le mot du meneur, ou quand toutes ses lettres sont dévoilées.</li>' +
+        '</ol></div>' +
+        '<div class="card"><div class="tag">Points</div>' +
+          '<p class="small muted" style="margin-top:6px">Trouver le mot : 2 points. Mot dévoilé en entier : 1 point pour chaque devineur. Chaque blocage : 1 point pour le meneur.</p></div>' +
+        '<div class="grow"></div>' +
+        '<button class="btn" data-a="home">Retour</button>';
+    },
+
+    setup: function () {
+      var rows = S.draftNames.map(function (n, i) {
+        return '<div class="player-row">' +
+          '<input type="text" maxlength="16" autocomplete="off" autocapitalize="words" placeholder="Joueur ' + (i + 1) + '" value="' + esc(n) + '" data-name="' + i + '">' +
+          (S.draftNames.length > MIN_PLAYERS ? '<button class="icon-btn" data-a="del" data-i="' + i + '" aria-label="Retirer le joueur ' + (i + 1) + '">×</button>' : '') +
+        '</div>';
+      }).join('');
+      return '<div class="tag">Nouvelle partie</div><h1>Qui joue ?</h1>' +
+        '<p class="muted small">De ' + MIN_PLAYERS + ' à ' + MAX_PLAYERS + ' joueurs. Le premier de la liste commence comme meneur.</p>' +
+        '<div class="stack">' + rows + '</div>' +
+        (S.draftNames.length < MAX_PLAYERS ? '<button class="btn ghost" data-a="add">+ Ajouter un joueur</button>' : '') +
+        '<div class="grow"></div>' +
+        '<button class="btn primary" data-a="start">Commencer</button>' +
+        '<button class="btn ghost" data-a="home">Retour</button>';
+    },
+
+    pass: function () {
+      return '<div class="hero center">' +
+          '<div class="tag">Manche ' + (S.round + 1) + '</div>' +
+          '<h1>Passe le téléphone à<br><span style="color:var(--accent)">' + esc(leaderName()) + '</span></h1>' +
+          '<p class="muted">' + esc(leaderName()) + ' est le meneur. Les autres ne regardent pas l’écran.</p>' +
+        '</div>' +
+        '<button class="btn primary" data-a="toWord">Je suis ' + esc(leaderName()) + '</button>' +
+        '<button class="btn ghost" data-a="scores">Voir les scores</button>';
+    },
+
+    word: function () {
+      return '<div class="tag">Meneur : ' + esc(leaderName()) + '</div><h1>Ton mot secret</h1>' +
+        '<p class="muted small">Un nom commun, 3 lettres minimum. Les accents et espaces sont retirés.</p>' +
+        '<input id="secret" class="secret' + (S.masked ? ' masked' : '') + '" type="text" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="MOT" value="' + esc(S.word) + '">' +
+        '<div class="row">' +
+          '<button class="btn slim grow" data-a="mask">' + (S.masked ? 'Afficher' : 'Masquer') + '</button>' +
+          '<button class="btn slim grow" data-a="random">Mot au hasard</button>' +
+        '</div>' +
+        '<div class="grow"></div>' +
+        '<button class="btn primary" data-a="lock">Valider et poser le téléphone</button>';
+    },
+
+    play: function () {
+      var tiles = prefix().split('').map(function (c, i) {
+        return '<div class="tile' + (S.justRevealed && i === S.revealed - 1 ? ' new' : '') + '">' + c + '</div>';
+      }).join('') + '<div class="tile more">?</div>';
+      return '<div class="row between">' +
+          '<div><div class="tag">Manche ' + (S.round + 1) + '</div><div class="small muted">Meneur : ' + esc(leaderName()) + '</div></div>' +
+          '<button class="btn slim" data-a="abandon">Abandonner</button>' +
+        '</div>' +
+        '<div class="card center"><div class="small muted">Le mot commence par</div>' +
+          '<div class="letters" aria-label="Lettres dévoilées : ' + prefix().split('').join(' ') + '">' + tiles + '</div>' +
+          '<div class="small muted">Vos indices doivent viser un mot en « ' + prefix() + '… »</div></div>' +
+        '<div class="stats">' +
+          '<div class="stat"><b style="color:var(--good)">' + S.stats.ok + '</b><span>réussis</span></div>' +
+          '<div class="stat"><b style="color:var(--bad)">' + S.stats.ko + '</b><span>ratés</span></div>' +
+          '<div class="stat"><b style="color:var(--warn)">' + S.stats.block + '</b><span>bloqués</span></div>' +
+        '</div>' +
+        '<div class="grow"></div>' +
+        '<button class="btn primary huge" data-a="contact">CONTACT !</button>' +
+        '<div class="row">' +
+          '<button class="btn" data-a="block">Le meneur bloque</button>' +
+          '<button class="btn good" data-a="found">Mot trouvé !</button>' +
+        '</div>' +
+        '<button class="btn slim peek" data-a="peek" style="width:100%">Meneur : maintenir pour revoir le mot</button>';
+    },
+
+    count: function () {
+      var go = S.countStep === 0;
+      return '<div class="count-screen">' +
+          '<div class="tag">Contact !</div>' +
+          '<div class="count-num' + (go ? ' go' : '') + '" aria-live="assertive">' + (go ? 'Dites<br>votre mot !' : S.countStep) + '</div>' +
+        '</div>' +
+        '<button class="btn" data-a="blockCount">Le meneur a dit le mot : bloqué</button>';
+    },
+
+    verdict: function () {
+      return '<div class="hero center">' +
+          '<div class="tag">Verdict</div><h1>Avez-vous dit<br>le même mot ?</h1>' +
+          '<p class="muted">Lettres actuelles : « ' + prefix() + '… »</p>' +
+        '</div>' +
+        '<button class="btn good" data-a="same">Oui, le même mot</button>' +
+        '<button class="btn bad" data-a="diff">Non, mots différents</button>' +
+        '<button class="btn" data-a="found">C’était le mot du meneur !</button>' +
+        '<button class="btn ghost" data-a="blockCount">Le meneur avait bloqué</button>';
+    },
+
+    found: function () {
+      var list = S.players.map(function (p, i) {
+        if (i === S.leader) return '';
+        var on = S.finders.indexOf(i) !== -1;
+        return '<button class="btn' + (on ? ' on' : '') + '" data-a="pick" data-i="' + i + '" aria-pressed="' + on + '">' + esc(p.name) + '</button>';
+      }).join('');
+      return '<div class="tag">Mot trouvé</div><h1>Qui a trouvé le mot ?</h1>' +
+        '<p class="muted small">Choisis un ou plusieurs joueurs. 2 points chacun.</p>' +
+        '<div class="pick">' + list + '</div>' +
+        '<div class="grow"></div>' +
+        '<button class="btn primary" data-a="confirmFound"' + (S.finders.length ? '' : ' disabled') + '>Valider</button>' +
+        '<button class="btn ghost" data-a="backPlay">Annuler</button>';
+    },
+
+    end: function () {
+      var title = S.outcome === 'found'
+        ? S.finders.map(function (i) { return esc(S.players[i].name); }).join(' et ') + ' ' + (S.finders.length > 1 ? 'ont' : 'a') + ' trouvé !'
+        : S.outcome === 'revealed' ? 'Mot entièrement dévoilé' : 'Manche abandonnée';
+      var tiles = S.word.split('').map(function (c) { return '<div class="tile">' + c + '</div>'; }).join('');
+      return '<div class="tag">Fin de la manche ' + S.round + '</div><h1>' + title + '</h1>' +
+        '<div class="card center"><div class="small muted">Meneur : ' + esc(S.players[S.prevLeader].name) + ' · son mot était</div>' +
+          '<div class="letters">' + tiles + '</div>' +
+          '<div class="small muted">Contacts : ' + S.stats.ok + ' réussi(s) · ' + S.stats.ko + ' raté(s) · ' + S.stats.block + ' bloqué(s)</div></div>' +
+        scoreCard() +
+        '<div class="grow"></div>' +
+        '<button class="btn primary" data-a="next">Manche suivante : ' + esc(leaderName()) + ' mène</button>' +
+        '<button class="btn ghost" data-a="finish">Terminer la partie</button>';
+    },
+
+    scores: function () {
+      return '<div class="tag">Scores</div><h1>Classement</h1>' + scoreCard() +
+        '<div class="grow"></div><button class="btn" data-a="backPass">Retour</button>';
+    },
+
+    final: function () {
+      var best = Math.max.apply(null, S.players.map(function (p) { return p.score; }));
+      var winners = S.players.filter(function (p) { return p.score === best; }).map(function (p) { return esc(p.name); });
+      return '<div class="hero center">' +
+          '<div class="tag">Partie terminée</div>' +
+          '<h1>' + (best === 0 ? 'Personne n’a marqué' : winners.join(' et ') + '<br>' + (winners.length > 1 ? 'gagnent' : 'gagne') + ' !') + '</h1>' +
+        '</div>' + scoreCard() +
+        '<button class="btn primary" data-a="rematch">Rejouer avec les mêmes joueurs</button>' +
+        '<button class="btn ghost" data-a="quit">Accueil</button>';
+    }
+  };
+
+  function scoreCard() {
+    var sorted = S.players.slice().sort(function (a, b) { return b.score - a.score; });
+    var best = sorted[0].score;
+    return '<div class="card">' + sorted.map(function (p) {
+      return '<div class="score-row"><span>' + (p.score === best && best > 0 ? '<span class="crown">★</span> ' : '') + esc(p.name) + '</span><b>' + p.score + '</b></div>';
+    }).join('') + '</div>';
+  }
+
+  function go(screen) {
+    S.screen = screen;
+    app.innerHTML = screens[screen]();
+    window.scrollTo(0, 0);
+    S.justRevealed = false;
+  }
+
+  // ---------- Déroulé ----------
+  function readDraft() {
+    var inputs = app.querySelectorAll('[data-name]');
+    for (var i = 0; i < inputs.length; i++) S.draftNames[i] = inputs[i].value;
+  }
+
+  function startRound() {
+    S.word = ''; S.revealed = 1; S.masked = true;
+    S.stats = { ok: 0, ko: 0, block: 0 };
+    S.finders = [];
+    go('pass');
+  }
+
+  function endRound(outcome) {
+    S.outcome = outcome;
+    S.prevLeader = S.leader;
+    if (outcome === 'found') {
+      S.finders.sort(function (a, b) { return a - b; });
+      S.finders.forEach(function (i) { S.players[i].score += 2; });
+      S.leader = S.finders[0];
+    } else {
+      if (outcome === 'revealed') {
+        S.players.forEach(function (p, i) { if (i !== S.leader) p.score += 1; });
+      }
+      S.leader = (S.leader + 1) % S.players.length;
+    }
+    S.round += 1;
+    save();
+    beep(outcome === 'abandon' ? 220 : 880, 500); buzz([80, 60, 160]);
+    go('end');
+  }
+
+  function leaderBlocks() {
+    clearCount();
+    S.stats.block += 1;
+    S.players[S.leader].score += 1;
+    save();
+    beep(180, 350); buzz(200);
+    go('play');
+    toast('Bloqué ! +1 pour ' + leaderName());
+  }
+
+  function runCount() {
+    clearCount();
+    S.countStep = 3;
+    go('count'); beep(520, 160); buzz(60);
+    [2, 1, 0].forEach(function (n, k) {
+      countTimers.push(setTimeout(function () {
+        S.countStep = n; go('count');
+        if (n) { beep(520, 160); buzz(60); } else { beep(1040, 450); buzz([120, 50, 120]); }
+      }, (k + 1) * 1000));
+    });
+    countTimers.push(setTimeout(function () { go('verdict'); }, 4400));
+  }
+
+  var actions = {
+    home: function () { go('home'); },
+    rules: function () { go('rules'); },
+    'new': function () {
+      S.draftNames = S.players.length ? S.players.map(function (p) { return p.name; }) : ['', '', ''];
+      go('setup');
+    },
+    resume: function () { startRound(); },
+    add: function () { readDraft(); S.draftNames.push(''); go('setup'); var all = app.querySelectorAll('[data-name]'); all[all.length - 1].focus(); },
+    del: function (el) { readDraft(); S.draftNames.splice(Number(el.dataset.i), 1); go('setup'); },
+    start: function () {
+      readDraft();
+      var names = S.draftNames.map(function (n, i) { return n.trim() || 'Joueur ' + (i + 1); });
+      var seen = {};
+      for (var i = 0; i < names.length; i++) {
+        var k = names[i].toLowerCase();
+        if (seen[k]) { toast('Deux joueurs s’appellent « ' + names[i] + ' »'); return; }
+        seen[k] = true;
+      }
+      S.players = names.map(function (n) { return { name: n, score: 0 }; });
+      S.leader = 0; S.round = 0;
+      save(); startRound();
+    },
+    toWord: function () { go('word'); },
+    scores: function () { go('scores'); },
+    backPass: function () { go('pass'); },
+    mask: function () { S.word = document.getElementById('secret').value; S.masked = !S.masked; go('word'); },
+    random: function () {
+      S.word = WORDS[Math.floor(Math.random() * WORDS.length)];
+      S.masked = false; go('word');
+    },
+    lock: function () {
+      var w = cleanWord(document.getElementById('secret').value);
+      if (w.length < 3) { toast('Il faut un mot d’au moins 3 lettres'); return; }
+      S.word = w; S.revealed = 1; S.justRevealed = true;
+      go('play');
+    },
+    contact: function () { runCount(); },
+    block: function () { leaderBlocks(); },
+    blockCount: function () { leaderBlocks(); },
+    same: function () {
+      S.stats.ok += 1;
+      if (S.revealed >= S.word.length - 1) { S.revealed = S.word.length; endRound('revealed'); return; }
+      S.revealed += 1; S.justRevealed = true;
+      beep(780, 220); buzz(90);
+      go('play'); toast('Contact réussi : nouvelle lettre');
+    },
+    diff: function () {
+      S.stats.ko += 1;
+      beep(200, 300); buzz(250);
+      go('play'); toast('Contact raté : pas de lettre');
+    },
+    found: function () { clearCount(); S.finders = []; go('found'); },
+    pick: function (el) {
+      var i = Number(el.dataset.i), at = S.finders.indexOf(i);
+      if (at === -1) S.finders.push(i); else S.finders.splice(at, 1);
+      go('found');
+    },
+    confirmFound: function () { if (S.finders.length) endRound('found'); },
+    backPlay: function () { go('play'); },
+    abandon: function () {
+      if (window.confirm('Abandonner la manche et dévoiler le mot ?')) endRound('abandon');
+    },
+    next: function () { startRound(); },
+    finish: function () { go('final'); },
+    rematch: function () {
+      S.players.forEach(function (p) { p.score = 0; });
+      S.leader = 0; S.round = 0; save(); startRound();
+    },
+    quit: function () {
+      S.players = []; S.round = 0; S.leader = 0;
+      try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+      go('home');
+    }
+  };
+
+  app.addEventListener('click', function (ev) {
+    var el = ev.target.closest('[data-a]');
+    if (!el || el.dataset.a === 'peek') return;
+    var fn = actions[el.dataset.a];
+    if (fn) fn(el);
+  });
+
+  // « Maintenir pour revoir le mot » : le mot n'apparaît que le doigt posé.
+  function peekOn(ev) {
+    var el = ev.target.closest('[data-a="peek"]');
+    if (!el) return;
+    ev.preventDefault();
+    el.textContent = S.word;
+  }
+  function peekOff() {
+    var el = app.querySelector('[data-a="peek"]');
+    if (el) el.textContent = 'Meneur : maintenir pour revoir le mot';
+  }
+  app.addEventListener('pointerdown', peekOn);
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { window.addEventListener(t, peekOff); });
+  app.addEventListener('contextmenu', function (ev) { if (ev.target.closest('[data-a="peek"]')) ev.preventDefault(); });
+
+  app.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter') return;
+    if (S.screen === 'word') actions.lock();
+    else if (S.screen === 'setup') ev.target.blur();
+  });
+
+  load();
+  go('home');
+})();
+</script>
+</body>
+</html>
